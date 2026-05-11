@@ -196,7 +196,7 @@ cd backend
 mvn test
 ```
 
-### Frontend (se houver)
+### Frontend 
 ```bash
 cd frontend
 npm test
@@ -204,7 +204,7 @@ npm test
 
 ---
 
-## Acessibilidade (mínimo)
+## Acessibilidade 
 
 - Contraste adequado em botões e textos
 - Navegação por teclado nos controles do timer (tab/enter/espaço)
@@ -222,5 +222,5 @@ npm test
 
 ## Licença
 
-Este projeto é acadêmico (FATEC). Se desejarem, definam uma licença (ex.: MIT) e adicionem o arquivo `LICENSE`.
+Este projeto é acadêmico (FATEC).
 [Documentação](https://docs.google.com/document/d/1vl71Kh0Ckn0GZDa-6J_AmvpVCEMm8ZmOYz5aGTzqBCo/edit?tab=t.0)
