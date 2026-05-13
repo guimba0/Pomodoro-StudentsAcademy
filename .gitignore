@@ -1,0 +1,27 @@
+# Maven build
+backend/target/
+
+# Runtime databases
+backend/pomodoro.db
+
+# Logs
+backend/spring-boot.log
+*.log
+
+# Dependencies
+frontend/node_modules/
+server/node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
