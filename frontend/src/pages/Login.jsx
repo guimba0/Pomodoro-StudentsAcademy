@@ -6,8 +6,11 @@ import { validarEmail } from '../utils/validation'
 
 import useTitle from '../hooks/useTitle'
 
+// 1. Pagina de login
 export default function Login() {
   useTitle('Entrar')
+
+  // 2. Estados do formulario
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
@@ -15,16 +18,21 @@ export default function Login() {
   const { setUser } = useAuth()
   const navigate = useNavigate()
 
+  // 3. Envia formulario de login
   async function handleSubmit(e) {
     e.preventDefault()
+    // 4. Valida email antes de enviar
     if (!validarEmail(email)) {
       setErro('Insira um email válido.')
       return
     }
     setErro('')
     setLoading(true)
+
+    // 5. Chama API de login
     const data = await fazerLogin(email, senha)
     if (data.logado) {
+      // 6. Sucesso: salva usuario no contexto e redireciona
       setUser({ nome: data.nome, email: data.email || email })
       navigate('/')
     } else {

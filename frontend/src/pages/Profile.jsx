@@ -1,14 +1,13 @@
 import { useAuth } from '../contexts/AuthContext'
-import { Navigate } from 'react-router-dom'
 
 import useTitle from '../hooks/useTitle'
 
+// 1. Pagina de perfil do usuario logado
 export default function Profile() {
   useTitle('Perfil')
   const { user } = useAuth()
 
-  if (!user) return <Navigate to="/login" replace />
-
+  // 2. Exibe avatar, nome, email e estatisticas (placeholder)
   return (
     <main className="auth-page">
       <div className="auth-card">

@@ -5,7 +5,9 @@ const AuthContext = createContext(null)
 
 const CACHE_KEY = 'pomodoro_user'
 
+// 1. Provider que envolve toda a app e gerencia o estado do usuario logado
 export function AuthProvider({ children }) {
+  // 2. Inicializa user com dados do sessionStorage (cache instantaneo)
   const [user, setUser] = useState(() => {
     try {
       const cached = sessionStorage.getItem(CACHE_KEY)
@@ -15,6 +17,7 @@ export function AuthProvider({ children }) {
     }
   })
 
+  // 3. No montagem, busca dados atualizados do servidor em background
   useEffect(() => {
     fetchMe().then((data) => {
       if (data.logado) {
@@ -28,6 +31,7 @@ export function AuthProvider({ children }) {
     })
   }, [])
 
+  // 4. Disponibiliza user e setUser para toda a arvore de componentes
   return (
     <AuthContext.Provider value={{ user, setUser }}>
       {children}
@@ -35,6 +39,7 @@ export function AuthProvider({ children }) {
   )
 }
 
+// 5. Hook para qualquer componente acessar o contexto de autenticacao
 export function useAuth() {
   return useContext(AuthContext)
 }

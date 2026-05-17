@@ -5,13 +5,16 @@ import { fazerLogout } from '../api/api'
 import ConfirmModal from './ConfirmModal'
 import { memo } from 'react'
 
+// 1. Barra de navegacao principal (visitante vs logado)
 function Navbar() {
+  // 2. Estados: usuario, dropdown, modal de logout
   const { user, setUser } = useAuth()
   const [open, setOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
 
+  // 3. Fecha dropdown ao clicar fora
   useEffect(() => {
     function handleClick(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -22,6 +25,7 @@ function Navbar() {
     return () => document.removeEventListener('click', handleClick)
   }, [])
 
+  // 4. Executa logout: fecha modal, chama API, limpa contexto, redireciona
   function handleLogout() {
     setShowLogoutModal(false)
     setOpen(false)
@@ -31,6 +35,7 @@ function Navbar() {
     })
   }
 
+  // 5. Renderizacao condicional: guest vs logado
   return (
     <header className={user ? 'navbar-logged-in' : 'navbar-guest'} role="banner">
       <Link to="/" className="nav-home" aria-label="Página inicial">

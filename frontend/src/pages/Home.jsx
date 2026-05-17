@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 
 import useTitle from '../hooks/useTitle'
 
+// 1. Pagina inicial com hero e CTA para o timer
 export default function Home() {
   useTitle('Início')
   return (

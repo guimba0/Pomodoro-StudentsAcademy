@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+// 1. Dados estaticos dos topicos do guia
 const topics = [
   {
     id: 'timer',
@@ -91,6 +92,7 @@ const topics = [
 
 import useTitle from '../hooks/useTitle'
 
+// 2. Pagina do guia interativo com abas laterais
 export default function Guide() {
   useTitle('Guia')
   const [active, setActive] = useState(topics[0].id)

@@ -1,5 +1,6 @@
 import { memo } from 'react'
 
+// 1. Rodape fixo com creditos da equipe
 function Footer() {
   return (
     <footer className="footer">

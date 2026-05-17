@@ -5,8 +5,11 @@ import { validarEmail } from '../utils/validation'
 
 import useTitle from '../hooks/useTitle'
 
+// 1. Pagina de cadastro de novo usuario
 export default function Register() {
   useTitle('Cadastrar')
+
+  // 2. Estados do formulario
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
@@ -15,17 +18,23 @@ export default function Register() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
+  // 3. Envia formulario de cadastro
   async function handleSubmit(e) {
     e.preventDefault()
     setErro('')
     setSucesso('')
+
+    // 4. Valida email
     if (!validarEmail(email)) {
       setErro('Insira um email válido.')
       return
     }
     setLoading(true)
+
+    // 5. Chama API de cadastro
     const data = await fazerCadastro(nome, email, senha)
     if (data.logado) {
+      // 6. Sucesso: mostra mensagem e redireciona para login
       setSucesso('Conta criada! Redirecionando para login...')
       setTimeout(() => navigate('/login'), 1500)
     } else {

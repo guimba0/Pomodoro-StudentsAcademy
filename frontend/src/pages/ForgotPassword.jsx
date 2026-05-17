@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom'
 import { apiFetch } from '../api/api'
 import useTitle from '../hooks/useTitle'
 
+// 1. Pagina de redefinicao de senha
 export default function ForgotPassword() {
   useTitle('Redefinir Senha')
 
+  // 2. Estados do formulario
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [confirmar, setConfirmar] = useState('')
@@ -13,11 +15,13 @@ export default function ForgotPassword() {
   const [sucesso, setSucesso] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // 3. Envia formulario de redefinicao
   async function handleSubmit(e) {
     e.preventDefault()
     setErro('')
     setSucesso('')
 
+    // 4. Validacoes
     if (!email.trim()) {
       setErro('Insira seu email.')
       return
@@ -31,6 +35,7 @@ export default function ForgotPassword() {
       return
     }
 
+    // 5. Chama API
     setLoading(true)
     const data = await apiFetch('/esqueci-senha', {
       method: 'POST',
