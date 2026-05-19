@@ -127,22 +127,12 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
    cd backend
    ```
 
-2. Configure o arquivo `application.properties` (ou `application.yml`) com as credenciais do MySQL. Exemplo:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/pomodoro_gamificado
-   spring.datasource.username=pomodoro
-   spring.datasource.password=pomodoro
-
-   spring.jpa.hibernate.ddl-auto=update
-   spring.jpa.show-sql=true
-   ```
-
-3. Execute:
+2. Execute:
    ```bash
    mvn spring-boot:run
    ```
 
-4. O backend deve iniciar em algo como:
+3. O backend deve iniciar em algo como:
    - `http://localhost:8080`
 
 ---
@@ -165,7 +155,7 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
    ```
 
 4. O frontend deve iniciar em algo como:
-   - `http://localhost:5173` (Vite) ou porta configurada no projeto
+   - `http://localhost:5173`
 
 ---
 
