@@ -19,12 +19,17 @@ public class Usuario {
   @Column(nullable = false)
   private String senha;
 
+  // CAMPO DA GAMIFICAÇÃO
+  @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+  private int pontos = 0; 
+
   public Usuario() {}
 
   public Usuario(String nome, String email, String senha) {
     this.nome = nome;
     this.email = email;
     this.senha = senha;
+    this.pontos = 0; // Garante que novos usuários começam com 0 pontos
   }
 
   public Long getId() { return id; }
@@ -38,4 +43,8 @@ public class Usuario {
 
   public String getSenha() { return senha; }
   public void setSenha(String senha) { this.senha = senha; }
+
+  // GET E SET DOS PONTOS 
+  public int getPontos() { return pontos; }
+  public void setPontos(int pontos) { this.pontos = pontos; }
 }
