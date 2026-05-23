@@ -74,20 +74,19 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
 ## Tecnologias
 
 **Backend**
-- Java + **Spring Boot**
-- (Sugestão) Spring Security para autenticação
-- MySQL (persistência)
+- Java + **Javalin**
+- SQLite
 
 **Frontend**
-- **React** ou **Vue** (SPA)
+- **React**
 - Comunicação com backend via API (JSON)
 
 **Banco**
-- **MySQL**
+- **SQLite**
 
 **Testes**
-- Backend: JUnit / Mockito (recomendado)
-- Frontend: testes de componentes (opcional, mas recomendado)
+- Backend: JUnit / Mockito 
+- Frontend: testes de componentes 
 
 ---
 
@@ -204,9 +203,9 @@ npm test
 
 ## Autores
 
-- Guilherme
-- Andressa
-- Henry
+- Guilherme: Front-end
+- Andressa: Back-end / Banco de Dados
+- Henry: Back-end
 
 ---
 
