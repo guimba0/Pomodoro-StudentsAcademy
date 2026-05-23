@@ -12,8 +12,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List; // <-- Importado para suportar a lista do ranking
+
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*") // <-- Importante para o seu React conseguir acessar o backend sem erro de CORS
 public class AuthController {
 
   private final UsuarioService service;
@@ -67,6 +70,13 @@ public class AuthController {
     }
     Usuario u = service.atualizar(userId, req.getNome(), req.getEmail(), req.getSenha());
     return ResponseEntity.ok(new UsuarioResponse(true, u.getNome(), u.getEmail()));
+  }
+
+  // Buscar o Ranking de Usuários
+  @GetMapping("/ranking")
+  public ResponseEntity<List<Usuario>> obterRanking() {
+    List<Usuario> ranking = service.obterTopRanking();
+    return ResponseEntity.ok(ranking);
   }
 
   private Long getUserId(HttpSession session) {
