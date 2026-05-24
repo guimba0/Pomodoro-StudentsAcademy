@@ -12,11 +12,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List; // <-- Importado para suportar a lista do ranking
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*") // <-- Importante para o seu React conseguir acessar o backend sem erro de CORS
+@CrossOrigin(origins = "*", allowCredentials = "true") // 🔥 Habilita suporte a cookies/sessões com o React
 public class AuthController {
 
   private final UsuarioService service;
@@ -72,11 +72,23 @@ public class AuthController {
     return ResponseEntity.ok(new UsuarioResponse(true, u.getNome(), u.getEmail()));
   }
 
-  // Buscar o Ranking de Usuários
   @GetMapping("/ranking")
   public ResponseEntity<List<Usuario>> obterRanking() {
     List<Usuario> ranking = service.obterTopRanking();
     return ResponseEntity.ok(ranking);
+  }
+
+  @PostMapping("/usuarios/adicionar-pontos")
+  public ResponseEntity<UsuarioResponse> adicionarPontos(HttpSession session) {
+    Long userId = getUserId(session);
+    
+    if (userId == null) {
+      return ResponseEntity.status(401).body(new UsuarioResponse("Não autenticado."));
+    }
+
+    // Soma 10 maçãs/pontos ao usuário logado na sessão
+    service.adicionarPontos(userId, 10);
+    return ResponseEntity.ok(new UsuarioResponse(true));
   }
 
   private Long getUserId(HttpSession session) {
