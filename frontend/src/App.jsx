@@ -16,6 +16,7 @@ const Register = lazy(() => import('./pages/Register'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Settings = lazy(() => import('./pages/Settings'))
+const Ranking = lazy(() => import('./pages/Ranking')) 
 
 // 2. Componente raiz que define layout e rotas
 export default function App() {
@@ -32,8 +33,12 @@ export default function App() {
             <Route path="/esqueci-senha" element={<ForgotPassword />} />
             <Route path="/perfil" element={<RotaProtegida><Profile /></RotaProtegida>} />
             <Route path="/configuracoes" element={<RotaProtegida><Settings /></RotaProtegida>} />
+          
             <Route path="/guia" element={<Guide />} />
-            <Route path="/pomodoro" element={<Pomodoro />} />
+            
+            <Route path="/timer" element={<Pomodoro />} />
+            
+            <Route path="/ranking" element={<Ranking />} />
           </Routes>
         </Suspense>
         <Footer />
