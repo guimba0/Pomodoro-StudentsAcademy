@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 export default function Pomodoro() {
-  const [minutos, setMinutos] = useState(0);
-  const [segundos, setSegundos] = useState(5);
+  const [minutos, setMinutos] = useState(25);
+  const [segundos, setSegundos] = useState(0);
   const [ativo, setAtivo] = useState(false);
   const [iniciado, setIniciado] = useState(false);
   const [ciclosCompletos, setCiclosCompletos] = useState(0);
@@ -28,10 +28,10 @@ export default function Pomodoro() {
     return 'pausaCurta';
   };
 
-  const tempoDoModo = (modo) => {
-    if (modo === 'foco') return { minutos: 0, segundos: 5 };
-    if (modo === 'pausaCurta') return { minutos: 0, segundos: 3 };
-    if (modo === 'pausaLonga') return { minutos: 0, segundos: 2 };
+const tempoDoModo = (modo) => {
+    if (modo === 'foco') return { minutos: 25, segundos: 0 };
+    if (modo === 'pausaCurta') return { minutos: 5, segundos: 0 };
+    if (modo === 'pausaLonga') return { minutos: 15, segundos: 0 };
   };
 
   const labelDoModo = (modo) => {
