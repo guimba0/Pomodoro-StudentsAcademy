@@ -33,11 +33,12 @@ export default function App() {
             <Route path="/esqueci-senha" element={<ForgotPassword />} />
             <Route path="/perfil" element={<RotaProtegida><Profile /></RotaProtegida>} />
             <Route path="/configuracoes" element={<RotaProtegida><Settings /></RotaProtegida>} />
-          
             <Route path="/guia" element={<Guide />} />
             
-            <Route path="/timer" element={<Pomodoro />} />
+            {/* Rota ajustada exatamente para o que o botão do seu menu chama */}
+            <Route path="/pomodoro" element={<Pomodoro />} />
             
+            {/* Rota do ranking configurada */}
             <Route path="/ranking" element={<Ranking />} />
           </Routes>
         </Suspense>
