@@ -44,5 +44,6 @@ public class Usuario {
   public void setSenha(String senha) { this.senha = senha; }
 
   public int getPoints() { return pontos; }
+  public int getPontos() { return pontos; }
   public void setPontos(int pontos) { this.pontos = pontos; }
 }

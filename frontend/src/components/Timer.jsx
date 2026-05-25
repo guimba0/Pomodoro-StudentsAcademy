@@ -41,6 +41,7 @@ export default function Timer({ onSessaoConcluida }) {
     };
 
     return (
+
         <div style={{ textAlign: 'center', padding: '20px', background: '#f9f9f9', borderRadius: '10px', maxWidth: '300px', margin: '20px auto' }}>
             <h2 style={{ fontSize: '3rem', margin: '10px 0', color: '#333' }}>
                 {formatarTempo(segundosRestantes)}
