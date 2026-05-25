@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 export default function Pomodoro() {
-  const [minutos, setMinutos] = useState(0);
-  const [segundos, setSegundos] = useState(5);
+  const [minutos, setMinutos] = useState(25);
+  const [segundos, setSegundos] = useState(0);
   const [ativo, setAtivo] = useState(false);
   const [ciclosCompletos, setCiclosCompletos] = useState(0);
   const TOTAL_CICLOS = 4;
