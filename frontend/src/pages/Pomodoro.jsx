@@ -9,6 +9,20 @@ export default function Pomodoro() {
   const [modoAtual, setModoAtual] = useState('foco');
   const TOTAL_CICLOS = 4;
 
+  const tocarSom = () => {
+    const contexto = new (window.AudioContext || window.webkitAudioContext)();
+    const oscilador = contexto.createOscillator();
+    const ganho = contexto.createGain();
+    oscilador.connect(ganho);
+    ganho.connect(contexto.destination);
+    oscilador.type = 'sine';
+    oscilador.frequency.setValueAtTime(880, contexto.currentTime);
+    ganho.gain.setValueAtTime(0.5, contexto.currentTime);
+    ganho.gain.exponentialRampToValueAtTime(0.001, contexto.currentTime + 0.8);
+    oscilador.start(contexto.currentTime);
+    oscilador.stop(contexto.currentTime + 0.8);
+  };
+
   const proximoModo = (ciclos) => {
     if (ciclos % TOTAL_CICLOS === 0) return 'pausaLonga';
     return 'pausaCurta';
@@ -47,6 +61,7 @@ export default function Pomodoro() {
             clearInterval(intervalo);
             setAtivo(false);
             setIniciado(false);
+            tocarSom();
 
             if (modoAtual === 'foco') {
               const novosCiclos = ciclosCompletos + 1;
