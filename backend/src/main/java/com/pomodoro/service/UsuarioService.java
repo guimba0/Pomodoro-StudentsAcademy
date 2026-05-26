@@ -3,7 +3,6 @@ package com.pomodoro.service;
 import com.pomodoro.model.Usuario;
 import com.pomodoro.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -23,10 +22,7 @@ public class UsuarioService {
     public Usuario adicionarPontos(Long id, int pontosGanhos) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-        
-        // Soma os pontos atuais com as novas maçãs ganhas
         usuario.setPontos(usuario.getPontos() + pontosGanhos);
-        
         return usuarioRepository.save(usuario);
     }
 
@@ -46,7 +42,6 @@ public class UsuarioService {
         return usuarioRepository.findById(id);
     }
 
-    // Redefine a senha (Esqueci a senha)
     public void redefinirSenha(String email, String novaSenha) {
         Usuario usuario = usuarioRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
@@ -57,17 +52,14 @@ public class UsuarioService {
     public Usuario atualizar(Long id, String nome, String email, String senha) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-
         if (usuarioRepository.existsByEmailAndIdNot(email, id)) {
             throw new RuntimeException("Este e-mail já está sendo usado por outro usuário.");
         }
-
         usuario.setNome(nome);
         usuario.setEmail(email);
         if (senha != null && !senha.isBlank()) {
-            usuario.setSenha(senha); 
+            usuario.setSenha(senha);
         }
-
         return usuarioRepository.save(usuario);
     }
 }

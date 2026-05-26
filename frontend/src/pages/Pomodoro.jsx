@@ -1,129 +1,173 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import { apiFetch } from '../api/api'
+import useTitle from '../hooks/useTitle'
 
 export default function Pomodoro() {
-  const [minutos, setMinutos] = useState(25);
-  const [segundos, setSegundos] = useState(0);
-  const [ativo, setAtivo] = useState(false);
-  const [iniciado, setIniciado] = useState(false);
-  const [ciclosCompletos, setCiclosCompletos] = useState(0);
-  const [modoAtual, setModoAtual] = useState('foco');
-  const TOTAL_CICLOS = 4;
+  useTitle('Timer Pomodoro')
+  const { user } = useAuth()
 
-  const tocarSom = () => {
-    const contexto = new (window.AudioContext || window.webkitAudioContext)();
-    const oscilador = contexto.createOscillator();
-    const ganho = contexto.createGain();
-    oscilador.connect(ganho);
-    ganho.connect(contexto.destination);
-    oscilador.type = 'sine';
-    oscilador.frequency.setValueAtTime(880, contexto.currentTime);
-    ganho.gain.setValueAtTime(0.5, contexto.currentTime);
-    ganho.gain.exponentialRampToValueAtTime(0.001, contexto.currentTime + 0.8);
-    oscilador.start(contexto.currentTime);
-    oscilador.stop(contexto.currentTime + 0.8);
-  };
+  const [minutos, setMinutos] = useState(25)
+  const [segundos, setSegundos] = useState(0)
+  const [ativo, setAtivo] = useState(false)
+  const [iniciado, setIniciado] = useState(false)
+  const [ciclosCompletos, setCiclosCompletos] = useState(0)
+  const [modoAtual, setModoAtual] = useState('foco')
+  const [macas, setMacas] = useState(0)
+  const [animacao, setAnimacao] = useState(null)
+  const TOTAL_CICLOS = 4
+  const MACAS_POR_CICLO = 5
 
-  const proximoModo = (ciclos) => {
-    if (ciclos % TOTAL_CICLOS === 0) return 'pausaLonga';
-    return 'pausaCurta';
-  };
+  const tocarSom = useCallback(() => {
+    const contexto = new (window.AudioContext || window.webkitAudioContext)()
+    const oscilador = contexto.createOscillator()
+    const ganho = contexto.createGain()
+    oscilador.connect(ganho)
+    ganho.connect(contexto.destination)
+    oscilador.type = 'sine'
+    oscilador.frequency.setValueAtTime(880, contexto.currentTime)
+    ganho.gain.setValueAtTime(0.5, contexto.currentTime)
+    ganho.gain.exponentialRampToValueAtTime(0.001, contexto.currentTime + 0.8)
+    oscilador.start(contexto.currentTime)
+    oscilador.stop(contexto.currentTime + 0.8)
+  }, [])
 
-const tempoDoModo = (modo) => {
-    if (modo === 'foco') return { minutos: 25, segundos: 0 };
-    if (modo === 'pausaCurta') return { minutos: 5, segundos: 0 };
-    if (modo === 'pausaLonga') return { minutos: 15, segundos: 0 };
-  };
+  const proximoModo = (ciclos) =>
+    ciclos % TOTAL_CICLOS === 0 ? 'pausaLonga' : 'pausaCurta'
+
+  const tempoDoModo = (modo) => {
+    if (modo === 'foco') return { minutos: 25, segundos: 0 }
+    if (modo === 'pausaCurta') return { minutos: 5, segundos: 0 }
+    if (modo === 'pausaLonga') return { minutos: 15, segundos: 0 }
+  }
 
   const labelDoModo = (modo) => {
-    if (modo === 'foco') return 'Tempo de Foco 🍅';
-    if (modo === 'pausaCurta') return 'Pausa Curta ☕';
-    if (modo === 'pausaLonga') return 'Pausa Longa 🌿';
-  };
+    if (modo === 'foco') return 'Tempo de Foco 🍅'
+    if (modo === 'pausaCurta') return 'Pausa Curta ☕'
+    if (modo === 'pausaLonga') return 'Pausa Longa 🌿'
+  }
+
+  const ganharMacas = (quantidade) => {
+    setMacas(m => m + quantidade)
+    setAnimacao(`+${quantidade}`)
+    setTimeout(() => setAnimacao(null), 1000)
+  }
 
   const reiniciar = () => {
-    setAtivo(false);
-    setIniciado(false);
-    setCiclosCompletos(0);
-    setModoAtual('foco');
-    setMinutos(tempoDoModo('foco').minutos);
-    setSegundos(tempoDoModo('foco').segundos);
-  };
+    setAtivo(false)
+    setIniciado(false)
+    setCiclosCompletos(0)
+    setMacas(0)
+    setModoAtual('foco')
+    const t = tempoDoModo('foco')
+    setMinutos(t.minutos)
+    setSegundos(t.segundos)
+  }
+
+  const salvarPontosNoBackend = useCallback(() => {
+    apiFetch('/usuarios/adicionar-pontos', { method: 'POST' })
+      .catch(err => console.error('Erro ao salvar pontos:', err))
+  }, [])
 
   useEffect(() => {
-    let intervalo = null;
+    const t = tempoDoModo(modoAtual)
+    setMinutos(t.minutos)
+    setSegundos(t.segundos)
+  }, [modoAtual])
 
-    if (ativo) {
-      intervalo = setInterval(() => {
-        if (segundos > 0) {
-          setSegundos(segundos - 1);
-        } else if (segundos === 0) {
-          if (minutos === 0) {
-            clearInterval(intervalo);
-            setAtivo(false);
-            setIniciado(false);
-            tocarSom();
+  useEffect(() => {
+    if (!ativo) return
 
-            if (modoAtual === 'foco') {
-              const novosCiclos = ciclosCompletos + 1;
-              setCiclosCompletos(novosCiclos);
-              salvarPontosNoBackend();
+    const intervalo = setInterval(() => {
+      setSegundos(prev => {
+        if (prev > 0) return prev - 1
 
+        setMinutos(prevMin => {
+          if (prevMin > 0) return prevMin - 1
+
+          clearInterval(intervalo)
+          setAtivo(false)
+          setIniciado(false)
+          tocarSom()
+
+          if (modoAtual === 'foco') {
+            setCiclosCompletos(ciclos => {
+              const novosCiclos = ciclos + 1
+              salvarPontosNoBackend()
+              ganharMacas(MACAS_POR_CICLO)
               if (novosCiclos % TOTAL_CICLOS === 0) {
-                alert(`🎉 Parabéns! Você completou ${TOTAL_CICLOS} ciclos de foco!\nVocê ganhou maçãs e pontos bônus! 🍎✨\nAproveite sua pausa longa, você merece! 🌿`);
+                alert(`🎉 Parabéns! Você completou ${TOTAL_CICLOS} ciclos de foco!\nVocê ganhou maçãs e pontos bônus! 🍎✨\nAproveite sua pausa longa, você merece! 🌿`)
               } else {
-                alert('Foco concluído! Você ganhou maçãs! 🍎\nHora de uma pausa curta! ☕');
+                alert('Foco concluído! Você ganhou maçãs! 🍎\nHora de uma pausa curta! ☕')
               }
-
-              const proximo = proximoModo(novosCiclos);
-              const tempo = tempoDoModo(proximo);
-              setModoAtual(proximo);
-              setMinutos(tempo.minutos);
-              setSegundos(tempo.segundos);
-
-            } else if (modoAtual === 'pausaLonga') {
-              alert('💪 Descansou bem? Que tal mais 4 ciclos?\nVocê está indo muito bem! Vamos lá! 🍅');
-              setCiclosCompletos(0);
-              const tempo = tempoDoModo('foco');
-              setModoAtual('foco');
-              setMinutos(tempo.minutos);
-              setSegundos(tempo.segundos);
-
-            } else {
-              alert('Pausa concluída! Hora de focar! 🍅');
-              const tempo = tempoDoModo('foco');
-              setModoAtual('foco');
-              setMinutos(tempo.minutos);
-              setSegundos(tempo.segundos);
-            }
-          } else {
-            setMinutos(minutos - 1);
-            setSegundos(59);
+              const proximo = proximoModo(novosCiclos)
+              setModoAtual(proximo)
+              return novosCiclos
+            })
+            return 0
           }
-        }
-      }, 1000);
-    } else {
-      clearInterval(intervalo);
-    }
 
-    return () => clearInterval(intervalo);
-  }, [ativo, minutos, segundos]);
+          if (modoAtual === 'pausaLonga') {
+            alert('💪 Descansou bem? Que tal mais 4 ciclos?\nVocê está indo muito bem! Vamos lá! 🍅')
+            setCiclosCompletos(0)
+            setMacas(0)
+          } else {
+            alert('Pausa concluída! Hora de focar! 🍅')
+          }
 
-  const salvarPontosNoBackend = () => {
-    fetch('http://localhost:8080/api/usuarios/adicionar-pontos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    }).catch(err => console.error('Erro ao salvar pontos:', err));
-  };
+          setModoAtual('foco')
+          return 0
+        })
+
+        return 59
+      })
+    }, 1000)
+
+    return () => clearInterval(intervalo)
+  }, [ativo, modoAtual, tocarSom, salvarPontosNoBackend])
 
   return (
-    <div style={{ padding: '60px', color: 'white', textAlign: 'center' }}>
+    <div style={{ padding: '60px', color: 'white', textAlign: 'center', position: 'relative' }}>
+
+      {/* Contador de maçãs */}
+      <div style={{ position: 'absolute', top: '20px', right: '30px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1.2rem' }}>
+        <span>🍎</span>
+        <span style={{ color: '#aaa' }}>:</span>
+        <span style={{ fontWeight: 'bold' }}>{macas}</span>
+        {animacao && (
+          <span style={{
+            position: 'absolute',
+            top: '-24px',
+            right: '0',
+            color: '#FFD700',
+            fontWeight: 'bold',
+            fontSize: '1rem',
+            animation: 'subirSumir 1s ease-out forwards',
+          }}>
+            {animacao}
+          </span>
+        )}
+      </div>
+
+      <style>{`
+        @keyframes subirSumir {
+          0% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-30px); }
+        }
+      `}</style>
+
+      {user && (
+        <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '10px' }}>
+          Olá, <strong>{user.nome}</strong>! Bons estudos! 🍅
+        </p>
+      )}
+
       <h1 style={{ fontSize: '3rem', marginBottom: '20px' }}>{labelDoModo(modoAtual)}</h1>
 
       <div style={{ fontSize: '6rem', fontWeight: 'bold', margin: '20px 0', fontFamily: 'monospace' }}>
         {String(minutos).padStart(2, '0')}:{String(segundos).padStart(2, '0')}
       </div>
 
-      {/* Contador de ciclos */}
       {modoAtual === 'foco' && (
         <>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', margin: '16px 0' }}>
@@ -149,59 +193,35 @@ const tempoDoModo = (modo) => {
         </>
       )}
 
-      {/* Botões */}
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
         {!iniciado ? (
-          <button
-            onClick={() => { setAtivo(true); setIniciado(true); }}
-            style={{
-              padding: '15px 40px',
-              fontSize: '1.2rem',
-              fontWeight: 'bold',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
+          <button onClick={() => { setAtivo(true); setIniciado(true) }} style={btnStyle('#28a745')}>
             {modoAtual === 'foco' ? 'Iniciar Foco' : 'Iniciar Pausa'}
           </button>
         ) : (
           <>
-            <button
-              onClick={() => setAtivo(!ativo)}
-              style={{
-                padding: '15px 40px',
-                fontSize: '1.2rem',
-                fontWeight: 'bold',
-                backgroundColor: ativo ? '#ffc107' : '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}
-            >
+            <button onClick={() => setAtivo(a => !a)} style={btnStyle(ativo ? '#ffc107' : '#28a745')}>
               {ativo ? 'Pausar' : 'Retomar'}
             </button>
-            <button
-              onClick={reiniciar}
-              style={{
-                padding: '15px 40px',
-                fontSize: '1.2rem',
-                fontWeight: 'bold',
-                backgroundColor: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}
-            >
+            <button onClick={reiniciar} style={btnStyle('#dc3545')}>
               Reiniciar
             </button>
           </>
         )}
       </div>
     </div>
-  );
+  )
+}
+
+function btnStyle(bg) {
+  return {
+    padding: '15px 40px',
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    backgroundColor: bg,
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+  }
 }
