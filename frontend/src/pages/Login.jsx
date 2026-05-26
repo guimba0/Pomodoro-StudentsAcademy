@@ -30,15 +30,14 @@ export default function Login() {
     setLoading(true)
 
     // 5. Chama API de login
-    const data = await fazerLogin(email, senha)
-    if (data.logado) {
-      // 6. Sucesso: salva usuario no contexto e redireciona
-      setUser({ nome: data.nome, email: data.email || email })
-      navigate('/')
-    } else {
-      setLoading(false)
-      setErro(data.erro || 'Email ou senha incorretos.')
-    }
+   const data = await fazerLogin(email, senha)
+       if (data.id) {
+         setUser({ nome: data.nome, email: data.email || email })
+         navigate('/')
+       } else {
+         setLoading(false)
+         setErro(data.erro || 'Email ou senha incorretos.')
+       }
   }
 
   return (
