@@ -39,3 +39,8 @@ export function fazerCadastro(nome, email, senha) {
 export function fazerLogout() {
   return apiFetch('/logout', { method: 'POST' });
 }
+
+// 6. Busca ranking semanal ou mensal (GET /api/ranking?periodo=weekly|monthly)
+export function fetchRanking(periodo = 'weekly') {
+  return apiFetch(`/ranking?periodo=${periodo}`);
+}

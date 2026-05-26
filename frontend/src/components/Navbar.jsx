@@ -39,7 +39,6 @@ function Navbar() {
       </Link>
 
       <nav className="nav-links" aria-label="Navegação principal">
-        {/* Timer e Ranking visíveis somente para usuários logados */}
         {user && (
           <>
             <Link to="/pomodoro">Timer</Link>

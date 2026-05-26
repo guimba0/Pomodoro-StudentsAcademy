@@ -1,78 +1,84 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { apiFetch } from '../api/api'
 import useTitle from '../hooks/useTitle'
+import { fetchRanking } from '../api/api'
+
+const periods = [
+  { id: 'weekly', label: 'Semanal' },
+  { id: 'monthly', label: 'Mensal' },
+]
+
+const medals = ['1st', '2nd', '3rd']
+
+function RankingRow({ pos, entry, isMe }) {
+  return (
+    <div className={`ranking-row${isMe ? ' ranking-row-me' : ''}`}>
+      <span className="ranking-pos">
+        {pos <= 3 ? <span className="ranking-medal">{medals[pos - 1]}</span> : `#${pos}`}
+      </span>
+      <div className="ranking-user">
+        <img className="ranking-avatar" src="/img/ProfilePhoto.png" alt="" />
+        <span className="ranking-name">{entry.nome}</span>
+        {isMe && <span className="ranking-badge">tu</span>}
+      </div>
+      <span className="ranking-stat">{entry.pontos} pts</span>
+      <span className="ranking-stat ranking-apples">{entry.macas} macas</span>
+    </div>
+  )
+}
 
 export default function Ranking() {
   useTitle('Ranking')
   const { user } = useAuth()
-  const [usuarios, setUsuarios] = useState([])
-  const [erro, setErro] = useState('')
-  const [carregando, setCarregando] = useState(true)
+  const [period, setPeriod] = useState('weekly')
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    apiFetch('/ranking')
-      .then(data => {
-        if (data.erro) {
-          setErro('Não foi possível carregar a classificação.')
-        } else {
-          setUsuarios(Array.isArray(data) ? data : [])
-        }
-      })
-      .catch(() => setErro('Não foi possível carregar a classificação.'))
-      .finally(() => setCarregando(false))
-  }, [])
+    setLoading(true)
+    fetchRanking(period).then(res => {
+      setData(res)
+      setLoading(false)
+    })
+  }, [period])
 
   return (
-    <div style={{ padding: '40px', color: 'white', textAlign: 'center' }}>
-      <h2 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🏆 Ranking de Maçãs</h2>
-      <p style={{ marginBottom: '8px' }}>Veja quem acumulou mais foco! 🍎</p>
-      {user && (
-        <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '30px' }}>
-          Logado como: <strong>{user.nome}</strong>
-        </p>
-      )}
+    <main className="ranking-page">
+      <div className="ranking-card-header">
+        <h1>Ranking</h1>
+        <p>Os <strong>mais focados</strong> da plataforma</p>
+      </div>
 
-      {carregando ? (
-        <p>Carregando...</p>
-      ) : erro ? (
-        <p style={{ color: '#ff6b6b' }}>{erro}</p>
-      ) : (
-        <div style={{ maxWidth: '500px', margin: '0 auto', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: '10px', padding: '20px' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid white', height: '40px' }}>
-                <th>Posição</th>
-                <th>Nome</th>
-                <th>Pontos 🍎</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuarios.map((u, index) => (
-                <tr
-                  key={u.id}
-                  style={{
-                    height: '40px',
-                    borderBottom: '1px solid rgba(255,255,255,0.1)',
-                    backgroundColor: u.email === user?.email ? 'rgba(76,175,80,0.2)' : 'transparent',
-                  }}
-                >
-                  <td style={{ fontWeight: 'bold' }}>
-                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}º`}
-                  </td>
-                  <td>{u.name || u.nome || 'Estudante'}</td>
-                  <td style={{ color: '#4caf50', fontWeight: 'bold' }}>{u.pontos}</td>
-                </tr>
-              ))}
-              {usuarios.length === 0 && (
-                <tr>
-                  <td colSpan="3" style={{ padding: '20px' }}>Nenhum estudante no ranking ainda.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      <div className="ranking-card">
+        <div className="ranking-tabs">
+          {periods.map(p => (
+            <button
+              key={p.id}
+              className={`ranking-tab${period === p.id ? ' active' : ''}`}
+              onClick={() => setPeriod(p.id)}
+            >
+              {p.label}
+            </button>
+          ))}
         </div>
-      )}
-    </div>
+
+        <div className="ranking-list">
+          {loading ? (
+            <p className="ranking-loader">A carregar...</p>
+          ) : data && data.length > 0 ? (
+            data.map((entry, i) => (
+              <RankingRow
+                key={entry.id ?? i}
+                pos={i + 1}
+                entry={entry}
+                isMe={user && entry.email === user.email}
+              />
+            ))
+          ) : (
+            <p className="ranking-empty">Nenhum dado disponivel ainda.</p>
+          )}
+        </div>
+      </div>
+    </main>
   )
 }

@@ -25,14 +25,11 @@ export default function App() {
           <Navbar />
           <Suspense fallback={<LoadingScreen />}>
             <Routes>
-              {/* Rotas publicas */}
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/cadastro" element={<Register />} />
               <Route path="/esqueci-senha" element={<ForgotPassword />} />
               <Route path="/guia" element={<Guide />} />
-
-              {/* Rotas protegidas — exigem login */}
               <Route path="/pomodoro" element={<RotaProtegida><Pomodoro /></RotaProtegida>} />
               <Route path="/ranking" element={<RotaProtegida><Ranking /></RotaProtegida>} />
               <Route path="/perfil" element={<RotaProtegida><Profile /></RotaProtegida>} />
