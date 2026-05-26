@@ -1,9 +1,18 @@
 package com.pomodoro.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class CadastroRequest {
 
+  @NotBlank
   private String nome;
+
+  @NotBlank @Email
   private String email;
+
+  @NotBlank @Size(min = 3)
   private String senha;
 
   public String getNome() { return nome; }

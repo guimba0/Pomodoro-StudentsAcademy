@@ -1,8 +1,13 @@
 package com.pomodoro.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginRequest {
 
+  @NotBlank
   private String email;
+
+  @NotBlank
   private String senha;
 
   public String getEmail() { return email; }

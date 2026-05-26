@@ -2,9 +2,11 @@ package com.pomodoro.service;
 
 import com.pomodoro.model.Usuario;
 import com.pomodoro.repository.UsuarioRepository;
+import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class UsuarioService {
 
   private final UsuarioRepository usuarioRepository;
@@ -21,7 +23,7 @@ public class UsuarioService {
     Usuario usuario = usuarioRepository.findById(id)
       .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
     usuario.setPontos(usuario.getPontos() + pontosGanhos);
-    return usuarioRepository.update(usuario);
+    return usuarioRepository.save(usuario);
   }
 
   public Usuario cadastrar(String nome, String email, String senha) {
@@ -44,7 +46,7 @@ public class UsuarioService {
     Usuario usuario = usuarioRepository.findByEmail(email)
       .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
     usuario.setSenha(novaSenha);
-    usuarioRepository.update(usuario);
+    usuarioRepository.save(usuario);
   }
 
   public Usuario atualizar(Long id, String nome, String email, String senha) {
@@ -58,6 +60,6 @@ public class UsuarioService {
     if (senha != null && !senha.isBlank()) {
       usuario.setSenha(senha);
     }
-    return usuarioRepository.update(usuario);
+    return usuarioRepository.save(usuario);
   }
 }
