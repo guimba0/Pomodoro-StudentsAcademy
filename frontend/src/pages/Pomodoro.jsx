@@ -260,8 +260,7 @@ export default function Pomodoro() {
     </div>
   )
 }
-  )
-}
+
 
 function btnStyle(bg) {
   return {

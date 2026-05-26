@@ -7,6 +7,8 @@ public class UsuarioResponse {
   private String email;
   private String erro;
 
+  public UsuarioResponse() {}
+
   public UsuarioResponse(boolean logado) {
     this.logado = logado;
   }
