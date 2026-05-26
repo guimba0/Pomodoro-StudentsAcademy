@@ -1,4 +1,5 @@
 package com.pomodoro.service;
+
 import com.pomodoro.model.Usuario;
 import com.pomodoro.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import java.util.Optional;
 
 @Service
 public class UsuarioService {
+
     private final UsuarioRepository usuarioRepository;
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
@@ -20,8 +22,7 @@ public class UsuarioService {
     public Usuario adicionarPontos(Long id, int pontosGanhos) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-        int pontosAtuais = usuario.getPontos() != null ? usuario.getPontos().intValue() : 0;
-        usuario.setPontos((long) (pontosAtuais + pontosGanhos));
+        usuario.setPontos(usuario.getPontos() + pontosGanhos);
         return usuarioRepository.save(usuario);
     }
 
