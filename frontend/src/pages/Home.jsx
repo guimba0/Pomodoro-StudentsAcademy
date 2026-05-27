@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import useTitle from '../hooks/useTitle'
+import TomatoIcon from '../components/TomatoIcon'
 
 // 1. Pagina inicial com hero e CTA para o timer
 export default function Home() {
@@ -21,7 +22,7 @@ export default function Home() {
         </div>
       </div>
       <div className="hero-visual">
-        <img className="hero-tomato" src="/img/tomate.webp" alt="Tomate Pomodoro" />
+        <TomatoIcon className="hero-tomato" />
         <Link to="/pomodoro" className="hero-btn">Comece agora!</Link>
       </div>
     </main>

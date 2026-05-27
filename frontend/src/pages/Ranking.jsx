@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import useTitle from '../hooks/useTitle'
 import { fetchRanking } from '../api/api'
+import TomatoIcon from '../components/TomatoIcon'
 
 const medals = ['🥇', '🥈', '🥉']
 
@@ -12,15 +13,15 @@ function RankingRow({ pos, entry, isMe }) {
         {pos <= 3 ? <span className="ranking-medal">{medals[pos - 1]}</span> : `#${pos}`}
       </span>
       <div className="ranking-user">
-        <img className="ranking-avatar" src="/img/tomate.webp" alt="" />
+        <TomatoIcon className="ranking-avatar" />
         <span className="ranking-name">{entry.nome}</span>
         {isMe && <span className="ranking-badge">tu</span>}
       </div>
       <div className="ranking-stats">
-        <span className="ranking-stat" title="Pontos">{entry.pontos} pts</span>
-        <span className="ranking-stat ranking-stat-ciclos" title="Completos / Total">
-          ✅ {entry.completos}/{entry.totalCiclos}
+        <span className="ranking-stat ranking-stat-ciclos" title="Ciclos Completos">
+          ✅ {entry.completos} ciclos
         </span>
+        <span className="ranking-stat" title="Pontos">{entry.pontos} pts</span>
         <span className="ranking-stat ranking-stat-tomates" title="Tomates">
           🍅 {entry.tomates}
         </span>

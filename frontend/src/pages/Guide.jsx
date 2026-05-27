@@ -41,7 +41,7 @@ const topics = [
   },
   {
     id: 'pontos',
-    heading: 'Pontos e Maçãs',
+    heading: 'Pontos e Tomates',
     content: (
       <>
         <p>

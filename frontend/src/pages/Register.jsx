@@ -54,7 +54,7 @@ export default function Register() {
       <div className="auth-card">
         <h1>Cadastrar</h1>
         {erro && <div className="auth-error">{erro}</div>}
-        {sucesso && <div className="auth-success">{sucesso}</div>}
+
         <form onSubmit={handleSubmit}>
           <label htmlFor="nome">Nome</label>
           <input id="nome" type="text" placeholder="Seu nome" required value={nome} onChange={e => setNome(e.target.value)} />

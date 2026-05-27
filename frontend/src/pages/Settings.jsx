@@ -72,7 +72,7 @@ export default function Settings() {
             {abas.map(a => (
               <button
                 key={a.id}
-                className={`settings-block${ativa === a.id ? ' active' : ''}`}
+                className={`settings-block settings-block--conta${ativa === a.id ? ' active' : ''}`}
                 onClick={() => setAtiva(a.id)}
               >
                 {a.label}
@@ -110,20 +110,39 @@ export default function Settings() {
             )}
 
             {ativa === 'aparencia' && (
-              <>
-                <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 20 }}>Tema do site</h2>
+              <div className="aparencia-section">
+                <div className="aparencia-header">
+                  <h2>Aparência</h2>
+                  <p>Escolha o visual do site</p>
+                </div>
                 <div className="tema-opcoes">
                   {TEMAS.map(t => (
                     <button
                       key={t}
-                      className={`tema-btn${tema === t ? ' active' : ''}`}
+                      className={`tema-card tema-card--${t}${tema === t ? ' active' : ''}`}
                       onClick={() => setTema(t)}
                     >
-                      {t === 'normal' ? 'Normal' : t === 'light' ? 'Claro' : 'Escuro'}
+                      <div className={`tema-preview tema-preview--${t}`}>
+                        <div className="tema-preview-nav" />
+                        <div className="tema-preview-body">
+                          <div className="tema-preview-ln" />
+                          <div className="tema-preview-ln" />
+                          <div className="tema-preview-circ" />
+                        </div>
+                      </div>
+                      <div className="tema-info">
+                        <span className="tema-nome">
+                          {t === 'normal' ? 'Normal' : t === 'light' ? 'Claro' : 'Escuro'}
+                        </span>
+                        <span className="tema-desc">
+                          {t === 'normal' ? 'Padrão' : t === 'light' ? 'Modo claro' : 'Modo escuro'}
+                        </span>
+                      </div>
+                      {tema === t && <span className="tema-check">✓</span>}
                     </button>
                   ))}
                 </div>
-              </>
+              </div>
             )}
           </section>
         </div>

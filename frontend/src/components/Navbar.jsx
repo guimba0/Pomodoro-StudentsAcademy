@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { fazerLogout } from '../api/api'
 import ConfirmModal from './ConfirmModal'
+import TomatoIcon from './TomatoIcon'
 
 function Navbar() {
   const { user, setUser } = useAuth()
@@ -35,7 +36,7 @@ function Navbar() {
   return (
     <header className={user ? 'navbar-logged-in' : 'navbar-guest'} role="banner">
       <Link to="/" className="nav-home" aria-label="Página inicial">
-        <img className="nav-icon" src="/img/tomate.webp" alt="" aria-hidden="true" />
+        <TomatoIcon className="nav-icon" />
         <span className="nav-brand">Pomodoro</span>
       </Link>
 

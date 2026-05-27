@@ -27,7 +27,7 @@ public class UsuarioService {
   }
 
   public List<RankingResponse> obterTopRanking() {
-    return usuarioRepository.findTop10ByOrderByPontosDesc()
+    return usuarioRepository.findAll()
       .stream()
       .map(u -> {
         long total = sessionRepository.countByUsuarioId(u.getId());
@@ -39,6 +39,8 @@ public class UsuarioService {
           total, completos, falhos
         );
       })
+      .sorted((a, b) -> Long.compare(b.getCompletos(), a.getCompletos()))
+      .limit(10)
       .collect(Collectors.toList());
   }
 

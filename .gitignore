@@ -1,3 +1,6 @@
+# Build output
+frontend/dist/
+
 # Maven build
 backend/target/
 backend/dependency-reduced-pom.xml

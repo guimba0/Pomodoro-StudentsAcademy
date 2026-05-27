@@ -840,7 +840,7 @@ body {
 .settings-card {
   max-width: 1100px;
   margin: 0 auto;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 16px;
 }
 
@@ -890,6 +890,11 @@ body {
 .settings-block:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+.settings-block--conta,
+.settings-block--aparencia {
+  border: 2px solid #000;
 }
 
 .settings-content {
@@ -970,33 +975,209 @@ body {
   }
 }
 
+.aparencia-section {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.aparencia-header {
+  margin-bottom: 24px;
+}
+
+.aparencia-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.aparencia-header p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
 .tema-opcoes {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
-.tema-btn {
-  padding: 14px 28px;
+.tema-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 200px;
+  padding: 0;
   font-family: "Eczar", serif;
-  font-size: 17px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.tema-card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+}
+
+.tema-card.active {
+  box-shadow: 0 0 0 1px var(--color-primary), 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+.tema-card--normal {
+  background: rgba(221, 43, 28, 0.06);
+  border-color: rgba(221, 43, 28, 0.25);
+}
+
+.tema-card--normal.active {
+  border-color: #dd2b1c;
+  background: rgba(221, 43, 28, 0.1);
+}
+
+.tema-card--light {
+  background: rgba(217, 58, 43, 0.06);
+  border-color: rgba(217, 58, 43, 0.25);
+}
+
+.tema-card--light.active {
+  border-color: #d93a2b;
+  background: rgba(217, 58, 43, 0.1);
+}
+
+.tema-card--dark {
+  background: rgba(122, 46, 26, 0.06);
+  border-color: rgba(122, 46, 26, 0.25);
+}
+
+.tema-card--dark.active {
+  border-color: #7a2e1a;
+  background: rgba(122, 46, 26, 0.1);
+}
+
+.tema-preview {
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tema-preview-nav {
+  height: 18px;
+  border-radius: 0 0 6px 6px;
+  margin: 0 0 6px;
+}
+
+.tema-preview-body {
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tema-preview-ln {
+  height: 6px;
+  width: 60%;
+  border-radius: 3px;
+}
+
+.tema-preview-ln:nth-child(2) {
+  width: 40%;
+}
+
+.tema-preview-circ {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-top: 4px;
+}
+
+.tema-preview--normal {
+  background: linear-gradient(180deg, #2d1a14 0%, #1a1a1a 100%);
+}
+
+.tema-preview--normal .tema-preview-nav {
+  background: #dd2b1c;
+}
+
+.tema-preview--normal .tema-preview-ln {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.tema-preview--normal .tema-preview-circ {
+  background: #dd2b1c;
+}
+
+.tema-preview--light {
+  background: linear-gradient(180deg, #f0e8e0 0%, #f5f0eb 100%);
+}
+
+.tema-preview--light .tema-preview-nav {
+  background: #d93a2b;
+}
+
+.tema-preview--light .tema-preview-ln {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.tema-preview--light .tema-preview-circ {
+  background: #d93a2b;
+}
+
+.tema-preview--dark {
+  background: linear-gradient(180deg, #181010 0%, #0d0d0d 100%);
+}
+
+.tema-preview--dark .tema-preview-nav {
+  background: #7a2e1a;
+}
+
+.tema-preview--dark .tema-preview-ln {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tema-preview--dark .tema-preview-circ {
+  background: #7a2e1a;
+}
+
+.tema-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 16px 16px;
+}
+
+.tema-nome {
+  font-size: 16px;
   font-weight: 700;
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.06);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
 }
 
-.tema-btn:hover {
-  background: rgba(255, 255, 255, 0.13);
-  border-color: rgba(255, 255, 255, 0.4);
+.tema-desc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-weight: 400;
 }
 
-.tema-btn.active {
+.tema-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--color-primary);
-  border-color: var(--color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 900px) {
