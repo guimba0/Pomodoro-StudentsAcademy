@@ -22,7 +22,7 @@ export default function Timer({ onSessaoConcluida }) {
 
     const finalizarSessaoFoco = () => {
         setCiclosCompletos((c) => (c + 1) % (TOTAL_CICLOS + 1));
-        alert("🎉 Parabéns! Você concluiu sua sessão de foco e ganhou 10 tomate! 🍎");
+        alert("🎉 Parabéns! Você concluiu sua sessão de foco e ganhou 10 tomates! 🍅");
         fetch(`http://localhost:8080/api/usuarios/adicionar-pontos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }

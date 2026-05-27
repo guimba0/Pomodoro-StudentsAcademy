@@ -25,7 +25,7 @@ export default function Pomodoro() {
   const [mode, setMode] = useState('focus')
   const [sessionId, setSessionId] = useState(null)
   const [cycleCount, setCycleCount] = useState(0)
-  const [apples, setApples] = useState(() => Number(localStorage.getItem('macas')) || 0)
+  const [tomateCount, setTomateCount] = useState(0)
   const [recovered, setRecovered] = useState(false)
   const [message, setMessage] = useState('')
   const [progresso, setProgresso] = useState(null)
@@ -72,13 +72,9 @@ export default function Pomodoro() {
     } catch { }
   }, [])
 
-  const ganharMacas = (qtd) => {
+  const ganharTomates = (qtd) => {
     setAnimacao(qtd)
-    setTimeout(() => setApples((m) => {
-      const novo = m + qtd
-      localStorage.setItem('macas', novo)
-      return novo
-    }), 600)
+    setTimeout(() => setTomateCount((m) => m + qtd), 600)
     setTimeout(() => setAnimacao(null), 3200)
   }
 
@@ -135,7 +131,7 @@ export default function Pomodoro() {
       return
     }
 
-    ganharMacas(5)
+    ganharTomates(5)
     const n = cycleRef.current + 1
     setCycleCount(n)
     const prox = proximoModo(n)
@@ -197,8 +193,7 @@ export default function Pomodoro() {
     setMode('focus')
     setCycleCount(0)
     if (isAuthed) {
-      setApples(0)
-      localStorage.setItem('macas', 0)
+      setTomateCount(0)
     }
     setRecovered(false)
     timerFinishedRef.current = false
@@ -431,7 +426,7 @@ export default function Pomodoro() {
         .arvore-viva { color: #4caf50; }
       `}</style>
 
-      {/* Apple counter */}
+      {/* Tomato counter */}
       {isAuthed && (
         <div style={{
           position: 'absolute',
@@ -442,9 +437,9 @@ export default function Pomodoro() {
           gap: '8px',
           fontSize: '1.2rem'
         }}>
-          <span style={{ fontSize: '1.3rem' }}>🍎</span>
+          <span style={{ fontSize: '1.3rem' }}>🍅</span>
           <span style={{ color: 'rgba(255,255,255,0.5)' }}>:</span>
-          <span style={{ fontWeight: 'bold' }}>{apples}</span>
+          <span style={{ fontWeight: 'bold' }}>{tomateCount}</span>
           {animacao && (
             <span style={{
               position: 'absolute',
@@ -458,7 +453,7 @@ export default function Pomodoro() {
               animation: 'subirSumir 3s ease-out forwards',
               pointerEvents: 'none'
             }}>
-              +{animacao} 🍎
+              +{animacao} 🍅
             </span>
           )}
         </div>
@@ -652,7 +647,7 @@ export default function Pomodoro() {
               <div className="arvore-stats">
                 <span>Focos completos: <span className="valor">{treeData?.focosCompletos ?? 0}</span></span>
                 <span>Pontos: <span className="valor">{progresso?.pontos ?? 0}</span></span>
-                <span>Tomates: <span className="valor">{progresso?.tomates ?? 0}</span></span>
+                <span>🍅 Tomates: <span className="valor">{progresso?.tomates ?? 0}</span></span>
               </div>
             </div>
           ) : (

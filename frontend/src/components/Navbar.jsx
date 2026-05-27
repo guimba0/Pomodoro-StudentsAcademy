@@ -25,8 +25,9 @@ function Navbar() {
     setShowLogoutModal(false)
     setOpen(false)
     fazerLogout().then(() => {
+      localStorage.removeItem('pomodoro_token')
+      localStorage.removeItem('pomodoro_user')
       setUser(null)
-      sessionStorage.removeItem('pomodoro_user')
       navigate('/')
     })
   }

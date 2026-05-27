@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { fazerCadastro } from '../api/api'
+import { useAuth } from '../contexts/AuthContext'
 import { validarEmail } from '../utils/validation'
 
 import useTitle from '../hooks/useTitle'
@@ -14,15 +15,14 @@ export default function Register() {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
-  const [sucesso, setSucesso] = useState('')
   const [loading, setLoading] = useState(false)
+  const { setUser } = useAuth()
   const navigate = useNavigate()
 
   // 3. Envia formulario de cadastro
   async function handleSubmit(e) {
     e.preventDefault()
     setErro('')
-    setSucesso('')
 
     // 4. Valida email
     if (!validarEmail(email)) {
@@ -36,9 +36,11 @@ export default function Register() {
       const data = await fazerCadastro(nome, email, senha)
       if (data.erro) {
         setErro(data.erro)
-      } else {
-        setSucesso('Conta criada! Redirecionando para login...')
-        setTimeout(() => navigate('/login'), 1500)
+      } else if (data.token) {
+        localStorage.setItem('pomodoro_token', data.token)
+        localStorage.setItem('pomodoro_user', JSON.stringify({ nome: data.nome, email: data.email }))
+        setUser({ nome: data.nome, email: data.email })
+        navigate('/')
       }
     } catch {
       setErro('Erro de conexão com o servidor.')

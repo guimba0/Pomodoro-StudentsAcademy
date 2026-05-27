@@ -32,8 +32,10 @@ export default function Login() {
     // 5. Chama API de login
     try {
       const data = await fazerLogin(email, senha)
-      if (data.logado) {
+      if (data.logado && data.token) {
         setUser({ nome: data.nome, email: data.email || email })
+        localStorage.setItem('pomodoro_token', data.token)
+        localStorage.setItem('pomodoro_user', JSON.stringify({ nome: data.nome, email: data.email || email }))
         setLoading(false)
         navigate('/')
       } else {

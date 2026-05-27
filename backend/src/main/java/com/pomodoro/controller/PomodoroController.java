@@ -11,7 +11,7 @@ import com.pomodoro.model.Usuario;
 import com.pomodoro.repository.TreeStateRepository;
 import com.pomodoro.repository.UsuarioRepository;
 import com.pomodoro.service.PomodoroSessionService;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +36,8 @@ public class PomodoroController {
   }
 
   @PostMapping("/start")
-  public ResponseEntity<?> start(@Valid @RequestBody PomodoroStartRequest req, HttpSession session) {
-    Long usuarioId = (Long) session.getAttribute("usuarioId");
+  public ResponseEntity<?> start(@Valid @RequestBody PomodoroStartRequest req, HttpServletRequest request) {
+    Long usuarioId = (Long) request.getAttribute("usuarioId");
     if (usuarioId == null) {
       return ResponseEntity.status(401).body(new UsuarioResponse("Não autenticado"));
     }
@@ -59,8 +59,8 @@ public class PomodoroController {
   }
 
   @GetMapping("/current")
-  public ResponseEntity<?> current(HttpSession session) {
-    Long usuarioId = (Long) session.getAttribute("usuarioId");
+  public ResponseEntity<?> current(HttpServletRequest request) {
+    Long usuarioId = (Long) request.getAttribute("usuarioId");
     if (usuarioId == null) {
       return ResponseEntity.status(401).body(new UsuarioResponse("Não autenticado"));
     }
@@ -80,8 +80,8 @@ public class PomodoroController {
   }
 
   @PostMapping("/finish")
-  public ResponseEntity<?> finish(HttpSession session) {
-    Long usuarioId = (Long) session.getAttribute("usuarioId");
+  public ResponseEntity<?> finish(HttpServletRequest request) {
+    Long usuarioId = (Long) request.getAttribute("usuarioId");
     if (usuarioId == null) {
       return ResponseEntity.status(401).body(new UsuarioResponse("Não autenticado"));
     }
@@ -99,8 +99,8 @@ public class PomodoroController {
   }
 
   @PostMapping("/reset")
-  public ResponseEntity<?> reset(HttpSession session) {
-    Long usuarioId = (Long) session.getAttribute("usuarioId");
+  public ResponseEntity<?> reset(HttpServletRequest request) {
+    Long usuarioId = (Long) request.getAttribute("usuarioId");
     if (usuarioId == null) {
       return ResponseEntity.status(401).body(new UsuarioResponse("Não autenticado"));
     }
@@ -110,8 +110,8 @@ public class PomodoroController {
   }
 
   @GetMapping("/progresso")
-  public ResponseEntity<?> progresso(HttpSession session) {
-    Long usuarioId = (Long) session.getAttribute("usuarioId");
+  public ResponseEntity<?> progresso(HttpServletRequest request) {
+    Long usuarioId = (Long) request.getAttribute("usuarioId");
     if (usuarioId == null) {
       return ResponseEntity.status(401).body(new UsuarioResponse("Não autenticado"));
     }

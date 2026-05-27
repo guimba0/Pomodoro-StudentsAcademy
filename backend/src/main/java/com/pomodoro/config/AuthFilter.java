@@ -7,7 +7,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +23,12 @@ public class AuthFilter implements Filter {
     "/api/esqueci-senha",
     "/api/ranking"
   );
+
+  private final JwtUtil jwtUtil;
+
+  public AuthFilter(JwtUtil jwtUtil) {
+    this.jwtUtil = jwtUtil;
+  }
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -44,13 +49,20 @@ public class AuthFilter implements Filter {
     }
 
     if (path.startsWith("/api/")) {
-      HttpSession session = req.getSession(false);
-      if (session == null || session.getAttribute("usuarioId") == null) {
-        res.setStatus(401);
-        res.setContentType("application/json;charset=UTF-8");
-        res.getWriter().write("{\"erro\":\"Não autenticado\"}");
-        return;
+      String auth = req.getHeader("Authorization");
+      if (auth != null && auth.startsWith("Bearer ")) {
+        String token = auth.substring(7);
+        if (jwtUtil.tokenValido(token)) {
+          Long userId = jwtUtil.extrairUsuarioId(token);
+          req.setAttribute("usuarioId", userId);
+          chain.doFilter(request, response);
+          return;
+        }
       }
+      res.setStatus(401);
+      res.setContentType("application/json;charset=UTF-8");
+      res.getWriter().write("{\"erro\":\"Não autenticado\"}");
+      return;
     }
 
     chain.doFilter(request, response);

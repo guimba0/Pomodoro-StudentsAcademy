@@ -1333,16 +1333,27 @@ body {
   flex-shrink: 0;
 }
 
+.ranking-stats {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .ranking-stat {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--color-text-muted-light);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.ranking-apples {
-  width: 100px;
-  text-align: right;
+.ranking-stat-ciclos {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.ranking-stat-tomates {
+  font-size: 14px;
 }
 
 .ranking-loader {
@@ -1386,12 +1397,16 @@ body {
     font-size: 15px;
   }
 
-  .ranking-stat {
-    font-size: 13px;
+  .ranking-stats {
+    gap: 8px;
   }
 
-  .ranking-apples {
-    width: 80px;
+  .ranking-stat {
+    font-size: 12px;
+  }
+
+  .ranking-stat-ciclos {
+    font-size: 11px;
   }
 
   .ranking-avatar {

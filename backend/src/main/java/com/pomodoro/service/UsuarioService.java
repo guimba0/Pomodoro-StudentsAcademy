@@ -1,25 +1,45 @@
 package com.pomodoro.service;
 
+import com.pomodoro.dto.RankingResponse;
+import com.pomodoro.model.SessionStatus;
 import com.pomodoro.model.Usuario;
+import com.pomodoro.repository.PomodoroSessionRepository;
 import com.pomodoro.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
 
   private final UsuarioRepository usuarioRepository;
+  private final PomodoroSessionRepository sessionRepository;
   private final BCryptPasswordEncoder passwordEncoder;
 
-  public UsuarioService(UsuarioRepository usuarioRepository, BCryptPasswordEncoder passwordEncoder) {
+  public UsuarioService(UsuarioRepository usuarioRepository,
+                        PomodoroSessionRepository sessionRepository,
+                        BCryptPasswordEncoder passwordEncoder) {
     this.usuarioRepository = usuarioRepository;
+    this.sessionRepository = sessionRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
-  public List<Usuario> obterTopRanking() {
-    return usuarioRepository.findTop10ByOrderByPontosDesc();
+  public List<RankingResponse> obterTopRanking() {
+    return usuarioRepository.findTop10ByOrderByPontosDesc()
+      .stream()
+      .map(u -> {
+        long total = sessionRepository.countByUsuarioId(u.getId());
+        long completos = sessionRepository.countByUsuarioIdAndStatus(u.getId(), SessionStatus.COMPLETED);
+        long falhos = sessionRepository.countByUsuarioIdAndStatus(u.getId(), SessionStatus.FAILED);
+        return new RankingResponse(
+          u.getId(), u.getNome(), u.getEmail(),
+          u.getPontos(), u.getTomates(),
+          total, completos, falhos
+        );
+      })
+      .collect(Collectors.toList());
   }
 
   public Usuario adicionarPontos(Long id, int pontosGanhos) {

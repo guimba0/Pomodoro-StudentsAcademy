@@ -1,11 +1,20 @@
 const API = 'http://localhost:8080/api';
 
+function getToken() {
+  return localStorage.getItem('pomodoro_token');
+}
+
 // 1. Funcao generica que faz fetch para qualquer endpoint da API
 export async function apiFetch(path, options = {}) {
   try {
+    const token = getToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = 'Bearer ' + token;
+    }
+
     const res = await fetch(API + path, {
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       ...options,
     });
 
