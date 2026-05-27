@@ -43,11 +43,11 @@ function Navbar() {
       <nav className="nav-links" aria-label="Navegação principal">
         {user && (
           <>
-            <Link to="/pomodoro">Timer</Link>
-            <Link to="/ranking">Ranking</Link>
+            <Link to="/pomodoro" className="nav-link-guia">Timer</Link>
+            <Link to="/ranking" className="nav-link-guia">Ranking</Link>
           </>
         )}
-        <Link to="/guia">Guia</Link>
+            <Link to="/guia" className="nav-link-guia">Guia</Link>
       </nav>
 
       {user ? (

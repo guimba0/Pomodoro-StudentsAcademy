@@ -551,16 +551,7 @@ export default function Pomodoro() {
             {status === 'idle' && (
               <button
                 onClick={mode === 'focus' && isAuthed ? startFocusSession : startLocalTimer}
-                style={{
-                  padding: '10px 28px',
-                  fontSize: '1rem',
-                  fontWeight: 'bold',
-                  backgroundColor: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer'
-                }}>
+                className="pomodoro-btn pomodoro-btn-green">
                 {mode === 'focus' ? 'Iniciar Foco' : 'Iniciar ' + (mode === 'shortBreak' ? 'Pausa Curta' : 'Pausa Longa')}
               </button>
             )}
@@ -586,30 +577,12 @@ export default function Pomodoro() {
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                 <button
                   onClick={resetTimer}
-                  style={{
-                    padding: '10px 28px',
-                    fontSize: '1rem',
-                    fontWeight: 'bold',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer'
-                  }}>
+                  className="pomodoro-btn pomodoro-btn-red">
                   Reiniciar
                 </button>
                 <button
                   onClick={() => setStatus((s) => s === 'running' ? 'paused' : 'running')}
-                  style={{
-                    padding: '10px 28px',
-                    fontSize: '1rem',
-                    fontWeight: 'bold',
-                    backgroundColor: status === 'running' ? '#ffc107' : '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer'
-                  }}>
+                  className={`pomodoro-btn ${status === 'running' ? 'pomodoro-btn-yellow' : 'pomodoro-btn-green'}`}>
                   {status === 'running' ? 'Pausar' : 'Retomar'}
                 </button>
               </div>
