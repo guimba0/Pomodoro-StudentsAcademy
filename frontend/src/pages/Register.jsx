@@ -32,15 +32,14 @@ export default function Register() {
     setLoading(true)
 
     // 5. Chama API de cadastro
-    const data = await fazerCadastro(nome, email, senha)
-    if (data.logado) {
-      // 6. Sucesso: mostra mensagem e redireciona para login
-      setSucesso('Conta criada! Redirecionando para login...')
-      setTimeout(() => navigate('/login'), 1500)
-    } else {
-      setLoading(false)
-      setErro(data.erro || 'Erro ao cadastrar.')
-    }
+  const data = await fazerCadastro(nome, email, senha)
+  if (data.erro) {
+    setLoading(false)
+    setErro(data.erro)
+  } else {
+    setSucesso('Conta criada! Redirecionando para login...')
+    setTimeout(() => navigate('/login'), 1500)
+  }
   }
 
   return (

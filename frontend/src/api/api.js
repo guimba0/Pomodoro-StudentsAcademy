@@ -8,9 +8,16 @@ export async function apiFetch(path, options = {}) {
       headers: { 'Content-Type': 'application/json' },
       ...options,
     });
-    return res.json();
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { erro: data.erro || 'Erro desconhecido.' };
+    }
+
+    return data;
   } catch {
-    return { logado: false, erro: 'Erro de conexão com o servidor.' };
+    return { erro: 'Erro de conexão com o servidor.' };
   }
 }
 

@@ -17,7 +17,9 @@ export default function Pomodoro() {
   const [iniciado, setIniciado] = useState(false)
   const [ciclosCompletos, setCiclosCompletos] = useState(0)
   const [modoAtual, setModoAtual] = useState('foco')
-  const [macas, setMacas] = useState(0)
+const [macas, setMacas] = useState(() => {
+  return Number(localStorage.getItem('macas')) || 0
+})
   const [animacao, setAnimacao] = useState(null)
   const [mensagem, setMensagem] = useState('')
 
@@ -61,11 +63,15 @@ export default function Pomodoro() {
     return 'Pausa Longa'
   }
 
-  const ganharMacas = (qtd) => {
-    setAnimacao(qtd)
-    setTimeout(() => setMacas((m) => m + qtd), 600)
-    setTimeout(() => setAnimacao(null), 3200)
-  }
+const ganharMacas = (qtd) => {
+  setAnimacao(qtd)
+  setTimeout(() => setMacas((m) => {
+    const novo = m + qtd
+    localStorage.setItem('macas', novo)
+    return novo
+  }), 600)
+  setTimeout(() => setAnimacao(null), 3200)
+}
 
   const reiniciar = () => {
     setAtivo(false)
@@ -143,7 +149,7 @@ export default function Pomodoro() {
   const CY = H
 
   return (
-    <div className="pomodoro-page">
+  <div className="pomodoro-page" style={{ position: 'relative' }}>
       <style>{`
         @keyframes subirSumir {
           0% { opacity: 0; transform: translateY(20px) scale(0.7); }
@@ -158,7 +164,7 @@ export default function Pomodoro() {
       `}</style>
 
       <div style={{ position: 'absolute', top: '12px', right: '24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem' }}>
-        <span>Apple</span>
+        <span>🍎</span>
         <span style={{ color: 'rgba(255,255,255,0.5)' }}>:</span>
         <span style={{ fontWeight: 'bold' }}>{macas}</span>
         {animacao && (
@@ -168,7 +174,7 @@ export default function Pomodoro() {
             textShadow: '0 0 5px rgba(255,215,0,0.8), 0 0 10px rgba(255,215,0,0.6), 2px 2px 0 #000',
             animation: 'subirSumir 3s ease-out forwards', pointerEvents: 'none'
           }}>
-            +{animacao} Apple
+            +{animacao} 🍎
           </span>
         )}
       </div>
