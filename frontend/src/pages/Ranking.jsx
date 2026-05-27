@@ -22,7 +22,6 @@ function RankingRow({ pos, entry, isMe }) {
         {isMe && <span className="ranking-badge">tu</span>}
       </div>
       <span className="ranking-stat">{entry.pontos} pts</span>
-      <span className="ranking-stat ranking-apples">{entry.macas} macas</span>
     </div>
   )
 }
@@ -37,7 +36,11 @@ export default function Ranking() {
   useEffect(() => {
     setLoading(true)
     fetchRanking(period).then(res => {
-      setData(res)
+      if (res && Array.isArray(res)) {
+        setData(res)
+      } else {
+        setData([])
+      }
       setLoading(false)
     })
   }, [period])

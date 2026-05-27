@@ -80,6 +80,20 @@ public class AuthController {
     }
   }
 
+  @PostMapping("/usuarios/adicionar-pontos")
+  public ResponseEntity<?> adicionarPontos(HttpSession session) {
+    Long usuarioId = (Long) session.getAttribute("usuarioId");
+    if (usuarioId == null) {
+      return ResponseEntity.status(401).body(new UsuarioResponse("Não autenticado"));
+    }
+    try {
+      usuarioService.adicionarPontos(usuarioId, 10);
+      return ResponseEntity.ok(Map.of("mensagem", "Pontos adicionados!"));
+    } catch (RuntimeException e) {
+      return ResponseEntity.badRequest().body(new UsuarioResponse(e.getMessage()));
+    }
+  }
+
   @GetMapping("/ranking")
   public ResponseEntity<?> ranking() {
     return ResponseEntity.ok(usuarioService.obterTopRanking());

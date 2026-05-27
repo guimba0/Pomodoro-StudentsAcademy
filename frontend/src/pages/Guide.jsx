@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import useTitle from '../hooks/useTitle'
 
 // 1. Dados estaticos dos topicos do guia
 const topics = [
@@ -87,10 +88,8 @@ const topics = [
         </div>
       </>
     )
-  }
+  },
 ]
-
-import useTitle from '../hooks/useTitle'
 
 // 2. Pagina do guia interativo com abas laterais
 export default function Guide() {
