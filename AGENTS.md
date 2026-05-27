@@ -24,7 +24,7 @@ Este documento define **papéis**, **rituais**, **padrões de branch/commit**, *
 - Integração com API (fetch/axios)
 
 ### Henry — Qualidade + Gamificação + Documentação
-- Regras de pontuação/maçãs/árvore (validação e testes)
+- Regras de pontuação/tomate/árvore (validação e testes)
 - Testes automatizados (prioridade no backend)
 - Documentos (UML em `/docs`, ajustes do `SPECS.md`)
 - Apoio em ranking/histórico (incrementais), se houver tempo
@@ -153,7 +153,7 @@ Sugestões:
 
 ### Dados críticos
 - Estado do timer (principalmente para recuperação 120s)
-- Progresso (pontos, maçãs, estágio da árvore)
+- Progresso (pontos, tomate, estágio da árvore)
 
 ---
 
@@ -192,7 +192,7 @@ Sugestões:
 - Sem auto-start do próximo ciclo
 - Abandono: apenas **fechar a página** no foco
 - Recuperação: **graça de 120s**
-- Gamificação: pontos + maçãs (1 a cada 5 min) + árvore por evolução de foco concluído
+- Gamificação: pontos + tomate (1 a cada 5 min) + árvore por evolução de foco concluído
 - Execução: local
 
 ---
@@ -211,7 +211,7 @@ Mitigação:
 
 ### Risco: falta de testes
 Mitigação:
-- Priorizar testes em regras de negócio (pontos/maçãs/abandono)
+- Priorizar testes em regras de negócio (pontos/tomate/abandono)
 - “Travar” merge de features grandes sem ao menos 1 teste unitário crítico
 
 ---
@@ -222,7 +222,7 @@ Mitigação:
 2. Cadastrar conta / login
 3. Iniciar foco → mostrar árvore (semente)
 4. Simular “fechar a página” e voltar dentro de 120s → recupera
-5. Completar (ou simular conclusão) → ganha pontos/maçãs → árvore evolui
+5. Completar (ou simular conclusão) → ganha pontos/tomate → árvore evolui
 6. Mostrar progresso (saldo)
 
 ---

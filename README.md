@@ -3,7 +3,7 @@
 
 Aplicação web de produtividade baseada no método **Pomodoro** com **gamificação**: enquanto você estuda, você planta uma **árvore virtual** que evolui conforme você completa sessões de foco. Se você **fechar a página** durante o foco e não retornar em até **120 segundos**, a árvore **morre**.
 
-Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos (POO)** — **FATEC**.
+Projeto desenvolvido para a disciplina de **Progratomateo Orientada a Objetos (POO)** — **FATEC**.
 
 ---
 
@@ -53,7 +53,7 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
 ### Gamificação (apenas logado)
 - **Árvore virtual** com estágios: `semente → muda → árvore`
 - **Pontos** por minuto focado + **bônus** ao concluir um foco
-- **Moedas (maçãs)**: ganha 1 maçã a cada **5 minutos** de foco válido
+- **Moedas (tomate)**: ganha 1 tomate a cada **5 minutos** de foco válido
 
 ### Ranking e Amigos (se implementado)
 - Ranking **global** e/ou por **amigos**
@@ -67,7 +67,7 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
 - A árvore é vinculada a uma **sessão de foco** (25 min).
 - Se o usuário **fechar a página** durante o foco e **não retornar em até 120 segundos**, a sessão falha e a árvore **morre**.
 - Se o usuário retornar em **até 120 segundos**, o app **recupera a sessão** e o foco continua.
-- Pontos e maçãs só são gerados durante **foco válido** (pausas não contam).
+- Pontos e tomate só são gerados durante **foco válido** (pausas não contam).
 
 ---
 

@@ -1,82 +1,97 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { apiFetch } from '../api/api'
-import useTitle from '../hooks/useTitle'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-// 1. Pagina de redefinicao de senha
 export default function ForgotPassword() {
-  useTitle('Redefinir Senha')
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [mensagem, setMensagem] = useState('');
+  const [erro, setErro] = useState('');
+  const navigate = useNavigate();
 
-  // 2. Estados do formulario
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
-  const [confirmar, setConfirmar] = useState('')
-  const [erro, setErro] = useState('')
-  const [sucesso, setSucesso] = useState('')
-  const [loading, setLoading] = useState(false)
+  const handleRedefinirSenha = async (e) => {
+    e.preventDefault();
+    setErro('');
+    setMensagem('');
 
-  // 3. Envia formulario de redefinicao
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setErro('')
-    setSucesso('')
-
-    // 4. Validacoes
-    if (!email.trim()) {
-      setErro('Insira seu email.')
-      return
-    }
-    if (senha.length < 3) {
-      setErro('A senha deve ter pelo menos 3 caracteres.')
-      return
-    }
-    if (senha !== confirmar) {
-      setErro('Senhas não conferem.')
-      return
+    if (senha !== confirmarSenha) {
+      setErro('As senhas não coincidem.');
+      return;
     }
 
-    // 5. Chama API
-    setLoading(true)
-    const data = await apiFetch('/esqueci-senha', {
-      method: 'POST',
-      body: JSON.stringify({ email: email.trim(), senha }),
-    })
+    try {
+      const res = await fetch('http://localhost:8080/api/esqueci-senha', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, senha })
+      });
 
-    if (data.logado) {
-      setSucesso('Senha redefinida! Redirecionando para o login...')
-      setTimeout(() => window.location.href = '/login', 2000)
-    } else {
-      setLoading(false)
-      setErro(data.erro || 'Erro ao redefinir senha.')
+      const resultado = await res.json();
+
+      if (!res.ok) {
+        setErro(resultado.erro || 'Não foi possível alterar a senha. Verifique se o e-mail está cadastrado.');
+      } else {
+        setMensagem(resultado.mensagem || 'Senha alterada com sucesso!');
+        setTimeout(() => navigate('/login'), 2000);
+      }
+    } catch (catchErr) {
+      setErro('Erro de conexão com o servidor Java.');
     }
-  }
+  };
 
   return (
-    <main className="auth-page">
-      <div className="auth-card">
-        <h1>Redefinir Senha</h1>
-        {erro && <div className="auth-error">{erro}</div>}
-        {sucesso && <div className="auth-success">{sucesso}</div>}
+    <div style={{ padding: '40px', maxWidth: '400px', margin: '0 auto', color: 'white' }}>
+      <div style={{ backgroundColor: '#7a1f1d', padding: '30px', borderRadius: '10px', textAlign: 'center' }}>
+        <h2 style={{ marginBottom: '20px' }}>Redefinir Senha</h2>
 
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="email">Email</label>
-          <input id="email" type="email" placeholder="seu@email.com" required value={email} onChange={e => setEmail(e.target.value)} />
+        {erro && <div style={{ backgroundColor: '#ff6b6b', padding: '10px', borderRadius: '5px', marginBottom: '15px', fontSize: '0.9rem' }}>{erro}</div>}
+        {mensagem && <div style={{ backgroundColor: '#28a745', padding: '10px', borderRadius: '5px', marginBottom: '15px' }}>{mensagem}</div>}
 
-          <label htmlFor="senha">Nova senha</label>
-          <input id="senha" type="password" placeholder="Nova senha" required value={senha} onChange={e => setSenha(e.target.value)} />
+        <form onSubmit={handleRedefinirSenha} style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '5px' }}>Email</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              required 
+              style={{ width: '100%', padding: '10px', borderRadius: '5px', border: 'none', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white' }}
+            />
+          </div>
 
-          <label htmlFor="confirmar">Confirmar senha</label>
-          <input id="confirmar" type="password" placeholder="Confirme a nova senha" required value={confirmar} onChange={e => setConfirmar(e.target.value)} />
+          <div>
+            <label style={{ display: 'block', marginBottom: '5px' }}>Nova senha</label>
+            <input 
+              type="password" 
+              value={senha} 
+              onChange={(e) => setSenha(e.target.value)} 
+              required 
+              style={{ width: '100%', padding: '10px', borderRadius: '5px', border: 'none', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white' }}
+            />
+          </div>
 
-          <button type="submit" className="auth-btn" disabled={loading}>
-            {loading ? 'Redefinindo...' : 'Redefinir Senha'}
+          <div>
+            <label style={{ display: 'block', marginBottom: '5px' }}>Confirmar senha</label>
+            <input 
+              type="password" 
+              value={confirmarSenha} 
+              onChange={(e) => setConfirmarSenha(e.target.value)} 
+              required 
+              style={{ width: '100%', padding: '10px', borderRadius: '5px', border: 'none', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white' }}
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            style={{ width: '100%', padding: '12px', fontSize: '1.1rem', fontWeight: 'bold', backgroundColor: '#ff3b30', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', marginTop: '10px' }}
+          >
+            Redefinir Senha
           </button>
         </form>
-
-        <p className="auth-link">
-          Lembrou? <Link to="/login">Fazer login</Link>
-        </p>
       </div>
-    </main>
-  )
+    </div>
+  );
 }

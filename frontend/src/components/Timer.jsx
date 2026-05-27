@@ -22,8 +22,7 @@ export default function Timer({ onSessaoConcluida }) {
 
     const finalizarSessaoFoco = () => {
         setCiclosCompletos((c) => (c + 1) % (TOTAL_CICLOS + 1));
-        alert("🎉 Parabéns! Você concluiu sua sessão de foco e ganhou 10 maçãs! 🍎");
-
+        alert("🎉 Parabéns! Você concluiu sua sessão de foco e ganhou 10 tomate! 🍎");
         fetch(`http://localhost:8080/api/usuarios/adicionar-pontos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
@@ -47,28 +46,6 @@ export default function Timer({ onSessaoConcluida }) {
             <h2 style={{ fontSize: '3rem', margin: '10px 0', color: '#333' }}>
                 {formatarTempo(segundosRestantes)}
             </h2>
-
-            {/* Contador de ciclos */}
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', margin: '12px 0' }}>
-                {Array.from({ length: TOTAL_CICLOS }).map((_, i) => (
-                    <div
-                        key={i}
-                        title={`Ciclo ${i + 1}`}
-                        style={{
-                            width: '18px',
-                            height: '18px',
-                            borderRadius: '50%',
-                            backgroundColor: i < ciclosCompletos ? '#4caf50' : 'transparent',
-                            border: '2px solid',
-                            borderColor: i < ciclosCompletos ? '#4caf50' : '#aaa',
-                            transition: 'all 0.3s ease',
-                        }}
-                    />
-                ))}
-            </div>
-            <p style={{ fontSize: '0.8rem', color: '#888', margin: '0 0 12px' }}>
-                {ciclosCompletos}/{TOTAL_CICLOS} ciclos
-            </p>
 
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                 <button onClick={() => setAtivo(!ativo)} style={{ padding: '10px 20px', backgroundColor: ativo ? '#ff9800' : '#4caf50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>

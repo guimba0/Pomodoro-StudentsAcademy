@@ -47,10 +47,10 @@ const topics = [
           Enquanto você foca, acumula <strong>pontos</strong> por minuto válido. Ao concluir um ciclo, ganha um <strong>bônus</strong> extra.
         </p>
         <p className="mt-2">
-          A cada <strong>5 minutos</strong> de foco, você recebe 1 <strong>maçã</strong> (moeda do sistema). Pausas não geram recompensas.
+          A cada <strong>5 minutos</strong> de foco, você recebe 1 <strong>tomate</strong> (moeda do sistema). Pausas não geram recompensas.
         </p>
         <div className="guide-example">
-          <strong>momomomo:</strong> 25min foco = 25 pontos + 5 maçãs + bônus por conclusão
+          <strong>momomomo:</strong> 25min foco = 25 pontos + 5 tomate + bônus por conclusão
         </div>
       </>
     )
@@ -76,7 +76,7 @@ const topics = [
       <>
         <p>
           <strong>Visitante:</strong> usa o timer normalmente, mas sem salvar progresso, sem árvore, sem pontos.<br />
-          <strong>Logado:</strong> tudo é persistido — árvore, pontos, maçãs e ranking.
+          <strong>Logado:</strong> tudo é persistido — árvore, pontos, tomate e ranking.
         </p>
         <p className="mt-2">
           Faça <Link to="/cadastro">cadastro</Link> ou{' '}

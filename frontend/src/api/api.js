@@ -1,4 +1,4 @@
-const API = '/api';
+const API = 'http://localhost:8080/api';
 
 // 1. Funcao generica que faz fetch para qualquer endpoint da API
 export async function apiFetch(path, options = {}) {
@@ -9,13 +9,12 @@ export async function apiFetch(path, options = {}) {
       ...options,
     });
 
-    const data = await res.json();
-
     if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
       return { erro: data.erro || 'Erro desconhecido.' };
     }
 
-    return data;
+    return res.json();
   } catch {
     return { erro: 'Erro de conexão com o servidor.' };
   }
@@ -47,7 +46,15 @@ export function fazerLogout() {
   return apiFetch('/logout', { method: 'POST' });
 }
 
-// 6. Busca ranking semanal ou mensal (GET /api/ranking?periodo=weekly|monthly)
+// 6. Redefinir Senha (POST /api/esqueci-senha)
+export function redefinirSenhaApi(email, senha) {
+  return apiFetch('/esqueci-senha', {
+    method: 'POST',
+    body: JSON.stringify({ email, senha }),
+  });
+}
+
+// 7. Busca ranking (GET /api/ranking)
 export function fetchRanking(periodo = 'weekly') {
   return apiFetch(`/ranking?periodo=${periodo}`);
 }

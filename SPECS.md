@@ -13,7 +13,7 @@ Plataforma: **Web (100%)** — execução **local** (apresentação)
 Construir uma aplicação web de produtividade baseada no método **Pomodoro** com **gamificação**:
 
 - **Visitante (sem login):** usa somente o temporizador.
-- **Usuário autenticado:** usa temporizador + **árvore virtual**, **pontos** e **moedas (maçãs)**.
+- **Usuário autenticado:** usa temporizador + **árvore virtual**, **pontos** e **moedas (tomate)**.
 
 A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a página** durante o foco e não retornar em até **120s**, a árvore **morre** e a sessão é considerada falha.
 
@@ -37,7 +37,7 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
    - regra “fechou a página” com **graça de 120s** e **recuperação**.
 5. Gamificação:
    - **pontos por minuto** + **bônus por foco concluído**,
-   - **moedas (maçãs)** a cada **5 minutos** de foco válido.
+   - **moedas (tomate)** a cada **5 minutos** de foco válido.
 6. Notificação sonora no fim de foco/pausa.
 7. Acessibilidade mínima (contraste + teclado nos controles).
 8. Testes automatizados mínimos (backend).
@@ -83,7 +83,7 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
 ### 4.3 Pontos e moedas
 - Pontos: acumulados por tempo de foco + bônus por foco concluído.
 - Maçãs: 1 unidade a cada **5 minutos** de foco válido.
-- Pausas não geram pontos nem maçãs.
+- Pausas não geram pontos nem tomate.
 
 ### 4.4 Persistência
 - Visitante: sem persistência (ou persistência local apenas para conveniência, sem ranking).
@@ -119,8 +119,8 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
 ### 5.5 Gamificação
 - **RF-16** — Acumular pontos durante foco válido.
 - **RF-17** — Conceder bônus ao concluir foco.
-- **RF-18** — Conceder 1 maçã a cada 5 minutos de foco válido.
-- **RF-19** — Exibir saldo (pontos e maçãs) ao usuário autenticado.
+- **RF-18** — Conceder 1 tomate a cada 5 minutos de foco válido.
+- **RF-19** — Exibir saldo (pontos e tomate) ao usuário autenticado.
 
 ### 5.6 Incrementais
 - **RF-20 (Inc.)** — Histórico por dia/semana.
@@ -189,7 +189,7 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
 2. Sistema toca som
 3. Usuário encerra período
 4. Sistema marca foco como concluído
-5. Sistema soma pontos + bônus + maçãs correspondentes
+5. Sistema soma pontos + bônus + tomate correspondentes
 6. Sistema evolui árvore
 
 ### UC-06 (Inc.) — Ver ranking
@@ -209,7 +209,7 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
 4. Ao concluir foco, o usuário recebe pontos e bônus e a árvore evolui.
 5. Durante foco, ao fechar a página e voltar em até 120s, o estado do foco é recuperado.
 6. Durante foco, ao fechar a página e voltar após 120s, a sessão falha e árvore morre.
-7. A cada 5 minutos de foco válido, o saldo de maçãs aumenta.
+7. A cada 5 minutos de foco válido, o saldo de tomate aumenta.
 8. Ao final de cada período, ocorre notificação sonora.
 9. Existe comando documentado para rodar testes (ex.: `mvn test`) e eles passam.
 
@@ -254,7 +254,7 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
 - `POST /api/pomodoro/finish` (marca como concluído)
 
 ### Gamificação
-- `GET /api/profile/progress` (pontos, maçãs, árvore)
+- `GET /api/profile/progress` (pontos, tomate, árvore)
 
 ### Incrementais
 - `GET /api/history?range=day|week`
@@ -268,7 +268,7 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
 ### Backend
 - Testes unitários:
   - validação de cadastro/login (serviço)
-  - cálculo de pontos e maçãs por tempo de foco
+  - cálculo de pontos e tomate por tempo de foco
   - regra da graça de 120s (recupera vs falha)
 
 ### Frontend (opcional)
@@ -281,7 +281,7 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
 
 - **Semana 1–2:** setup repo, UI do timer (visitante), estrutura Spring, auth básica
 - **Semana 3–4:** sessão de foco persistida + recuperação 120s + árvore (estágios)
-- **Semana 5–6:** pontos + maçãs + telas de progresso + testes
+- **Semana 5–6:** pontos + tomate + telas de progresso + testes
 - **Semana 7:** ajustes, UX, acessibilidade mínima, documentação e UML
 - **Semana 8 (buffer):** incrementais (histórico/ranking/amigos) + estabilização
 

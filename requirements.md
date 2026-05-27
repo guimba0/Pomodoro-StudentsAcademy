@@ -8,7 +8,7 @@ Plataforma: **Web (100%)** · Execução **local**
 ---
 
 ## 1. Objetivo
-Desenvolver uma aplicação web baseada no método **Pomodoro** com **gamificação** por meio de uma **árvore virtual** que evolui com sessões de foco concluídas. Usuários **sem login** usam apenas o temporizador; usuários **logados** participam do sistema de árvore, pontos e moedas (maçãs).
+Desenvolver uma aplicação web baseada no método **Pomodoro** com **gamificação** por meio de uma **árvore virtual** que evolui com sessões de foco concluídas. Usuários **sem login** usam apenas o temporizador; usuários **logados** participam do sistema de árvore, pontos e moedas (tomate).
 
 ---
 
@@ -24,7 +24,7 @@ Desenvolver uma aplicação web baseada no método **Pomodoro** com **gamificaç
   - recuperação de sessão ao retornar dentro de 120s.
 - Gamificação (logado):
   - pontos por minuto de foco + bônus por foco concluído,
-  - 1 maçã a cada 5 minutos de foco válido.
+  - 1 tomate a cada 5 minutos de foco válido.
 - Notificação sonora ao final de foco/pausa.
 - Acessibilidade mínima (contraste e teclado nos controles do timer).
 - Testes automatizados mínimos no backend.
@@ -34,7 +34,7 @@ Desenvolver uma aplicação web baseada no método **Pomodoro** com **gamificaç
 - Ranking global (semana/mês).
 - Amigos + filtro de ranking por amigos.
 - Otimização para mobile.
-- Loja/skins para gastar maçãs.
+- Loja/skins para gastar tomate.
 
 ---
 
@@ -69,7 +69,7 @@ O sistema deve armazenar a senha usando hash (ex.: BCrypt), nunca em texto puro.
 O sistema deve permitir uso do timer Pomodoro sem login.
 
 **RF-07 — Sem gamificação no visitante**  
-No modo visitante, o sistema não deve disponibilizar árvore, pontos e maçãs.
+No modo visitante, o sistema não deve disponibilizar árvore, pontos e tomate.
 
 ---
 
@@ -120,10 +120,10 @@ O sistema deve atribuir pontos proporcionalmente ao tempo de foco válido.
 O sistema deve conceder bônus ao completar um foco com sucesso.
 
 **RF-20 — Maçãs por tempo**  
-O sistema deve conceder 1 maçã a cada 5 minutos de foco válido.
+O sistema deve conceder 1 tomate a cada 5 minutos de foco válido.
 
 **RF-21 — Visualização de saldo**  
-O sistema deve permitir ao usuário visualizar pontos e maçãs acumulados.
+O sistema deve permitir ao usuário visualizar pontos e tomate acumulados.
 
 ---
 
@@ -144,8 +144,8 @@ O sistema pode permitir adicionar amigos e filtrar o ranking apenas para amigos.
 **RN-01 — Sem persistência no visitante**  
 No modo visitante, progresso não é persistido em banco (apenas timer).
 
-**RN-02 — Pontos/maçãs só em foco**  
-Pontos e maçãs só são contabilizados durante foco válido; pausas não contam.
+**RN-02 — Pontos/tomate só em foco**  
+Pontos e tomate só são contabilizados durante foco válido; pausas não contam.
 
 **RN-03 — Graça de 120 segundos**  
 Ao fechar a página durante foco, a sessão permanece recuperável por 120s.
@@ -174,7 +174,7 @@ A aplicação deve ser executável localmente com instruções no README.
 Dados do usuário autenticado e sessões devem ser persistidos em MySQL.
 
 **RNF-05 — Testes automatizados**  
-Deve haver testes automatizados mínimos, especialmente para regras críticas (abandono 120s, cálculo de pontos/maçãs).
+Deve haver testes automatizados mínimos, especialmente para regras críticas (abandono 120s, cálculo de pontos/tomate).
 
 **RNF-06 — Acessibilidade mínima**  
 O timer deve ser operável por teclado e manter contraste adequado.
@@ -189,7 +189,7 @@ A interface do timer deve responder às ações (start/pause/resume/reset) sem t
 1. Visitante usa o timer completo sem criar conta.
 2. Usuário se cadastra, faz login e logout.
 3. Usuário autenticado inicia foco e visualiza árvore.
-4. Ao concluir um foco, usuário recebe pontos/maçãs e árvore evolui.
+4. Ao concluir um foco, usuário recebe pontos/tomate e árvore evolui.
 5. Se fechar a página durante foco e retornar em até 120s, a sessão é recuperada.
 6. Se retornar após 120s, a sessão falha e não há recompensa daquele foco.
 7. O sistema toca som ao final de foco/pausa.
