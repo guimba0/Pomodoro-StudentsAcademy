@@ -58,3 +58,33 @@ export function redefinirSenhaApi(email, senha) {
 export function fetchRanking(periodo = 'weekly') {
   return apiFetch(`/ranking?periodo=${periodo}`);
 }
+
+// --- Pomodoro ---
+
+// 8. Iniciar/recuperar sessao (POST /api/pomodoro/start)
+export function startPomodoro(tipo) {
+  return apiFetch('/pomodoro/start', {
+    method: 'POST',
+    body: JSON.stringify({ tipo }),
+  });
+}
+
+// 9. Buscar sessao atual (GET /api/pomodoro/current)
+export function getCurrentSession() {
+  return apiFetch('/pomodoro/current');
+}
+
+// 10. Finalizar sessao (POST /api/pomodoro/finish)
+export function finishPomodoro() {
+  return apiFetch('/pomodoro/finish', { method: 'POST' });
+}
+
+// 11. Cancelar sessao (POST /api/pomodoro/reset)
+export function resetPomodoro() {
+  return apiFetch('/pomodoro/reset', { method: 'POST' });
+}
+
+// 12. Progresso do usuario (GET /api/pomodoro/progresso)
+export function getProgresso() {
+  return apiFetch('/pomodoro/progresso');
+}

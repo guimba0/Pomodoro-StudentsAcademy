@@ -27,6 +27,9 @@ public class Usuario {
   @Column(nullable = false)
   private int pontos = 0;
 
+  @Column(nullable = false)
+  private int tomates = 0;
+
   public Usuario() {}
 
   public Usuario(String nome, String email, String senha) {
@@ -34,6 +37,7 @@ public class Usuario {
     this.email = email;
     this.senha = senha;
     this.pontos = 0;
+    this.tomates = 0;
   }
 
   public Long getId() { return id; }
@@ -50,4 +54,7 @@ public class Usuario {
 
   public int getPontos() { return pontos; }
   public void setPontos(int pontos) { this.pontos = pontos; }
+
+  public int getTomates() { return tomates; }
+  public void setTomates(int tomates) { this.tomates = tomates; }
 }

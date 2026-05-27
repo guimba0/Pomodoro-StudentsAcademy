@@ -3,70 +3,78 @@ import { useAuth } from '../contexts/AuthContext'
 import { apiFetch } from '../api/api'
 import useTitle from '../hooks/useTitle'
 
+const FOCUS_MIN = 25
+const SHORT_BREAK_MIN = 5
+const LONG_BREAK_MIN = 15
+const TOTAL_CYCLES = 4
+
 const RAIO = 110
 const CIRCUNFERENCIA = Math.PI * RAIO
+const W = 240
+const H = 130
+const CX = W / 2
+const CY = H
 
 export default function Pomodoro() {
   useTitle('Timer Pomodoro')
-
   const { user } = useAuth()
+  const isAuthed = !!user
 
-  const [minutos, setMinutos] = useState(0)
-  const [segundos, setSegundos] = useState(5)
-  const [ativo, setAtivo] = useState(false)
-  const [iniciado, setIniciado] = useState(false)
-  const [ciclosCompletos, setCiclosCompletos] = useState(0)
-  const [modoAtual, setModoAtual] = useState('foco')
-  const [macas, setMacas] = useState(() => {
-    return Number(localStorage.getItem('macas')) || 0
-  })
+  const [status, setStatus] = useState('idle')
+  const [remaining, setRemaining] = useState(FOCUS_MIN * 60)
+  const [mode, setMode] = useState('focus')
+  const [sessionId, setSessionId] = useState(null)
+  const [cycleCount, setCycleCount] = useState(0)
+  const [apples, setApples] = useState(() => Number(localStorage.getItem('macas')) || 0)
+  const [recovered, setRecovered] = useState(false)
+  const [message, setMessage] = useState('')
+  const [progresso, setProgresso] = useState(null)
+  const [showTreePanel, setShowTreePanel] = useState(false)
   const [animacao, setAnimacao] = useState(null)
-  const [mensagem, setMensagem] = useState('')
-  const [arvoreAberta, setArvoreAberta] = useState(false)
+  const [treeData, setTreeData] = useState(null)
 
-  const totalSegundosRef = useRef(5)
+  const totalRef = useRef(FOCUS_MIN * 60)
+  const hasAttemptedRecovery = useRef(false)
+  const intervalRef = useRef(null)
+  const timerFinishedRef = useRef(false)
+  const cycleRef = useRef(0)
 
-  const TOTAL_CICLOS = 4
-  const MACAS_POR_CICLO = 5
+  useEffect(() => { cycleRef.current = cycleCount }, [cycleCount])
 
-  const COR_ARCO = '#FFFFFF'
-  const COR_TRILHA = 'rgba(30,20,20,0.55)'
-  const ESPESSURA_ARCO = 5
-  const TAMANHO_TIMER = '3.7rem'
-  const TAMANHO_LABEL = '1.1rem'
-
-  const tocarSom = useCallback(() => {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)()
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.type = 'sine'
-    osc.frequency.setValueAtTime(880, ctx.currentTime)
-    gain.gain.setValueAtTime(0.5, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 0.8)
-  }, [])
-
-  const proximoModo = (ciclos) =>
-    ciclos % TOTAL_CICLOS === 0 ? 'pausaLonga' : 'pausaCurta'
-
-  const tempoDoModo = (modo) => {
-    if (modo === 'foco') return { minutos: 0, segundos: 5, total: 5 }
-    if (modo === 'pausaCurta') return { minutos: 0, segundos: 5, total: 5 }
-    return { minutos: 0, segundos: 2, total: 2 }
+  const getDuration = (m) => {
+    if (m === 'focus') return FOCUS_MIN * 60
+    if (m === 'shortBreak') return SHORT_BREAK_MIN * 60
+    return LONG_BREAK_MIN * 60
   }
 
-  const labelDoModo = (modo) => {
-    if (modo === 'foco') return 'Tempo de Foco'
-    if (modo === 'pausaCurta') return 'Pausa Curta'
+  const labelDoModo = (m) => {
+    if (m === 'focus') return 'Tempo de Foco'
+    if (m === 'shortBreak') return 'Pausa Curta'
     return 'Pausa Longa'
   }
 
+  const proximoModo = (ciclos) =>
+    ciclos % TOTAL_CYCLES === 0 ? 'longBreak' : 'shortBreak'
+
+  const tocarSom = useCallback(() => {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(880, ctx.currentTime)
+      gain.gain.setValueAtTime(0.5, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.8)
+    } catch { }
+  }, [])
+
   const ganharMacas = (qtd) => {
     setAnimacao(qtd)
-    setTimeout(() => setMacas((m) => {
+    setTimeout(() => setApples((m) => {
       const novo = m + qtd
       localStorage.setItem('macas', novo)
       return novo
@@ -74,82 +82,223 @@ export default function Pomodoro() {
     setTimeout(() => setAnimacao(null), 3200)
   }
 
-  const reiniciar = () => {
-    setAtivo(false)
-    setIniciado(false)
-    setCiclosCompletos(0)
-    setMacas(0)
-    localStorage.setItem('macas', 0)
-    setModoAtual('foco')
-    const t = tempoDoModo('foco')
-    setMinutos(t.minutos)
-    setSegundos(t.segundos)
-    totalSegundosRef.current = t.total
-  }
+  const fetchTreeData = useCallback(async () => {
+    if (!isAuthed) return
+    const data = await apiFetch('/pomodoro/progresso')
+    if (data && !data.erro) {
+      setProgresso(data)
+      setTreeData({
+        estagio: data.arvoreEstagio,
+        morta: data.arvoreMorta,
+        focosCompletos: data.focosCompletos,
+      })
+    }
+  }, [isAuthed])
 
-  const salvarPontos = useCallback(() => {
-    apiFetch('/usuarios/adicionar-pontos', {
-      method: 'POST'
-    }).catch((err) => console.error(err))
+  const startFocusSession = useCallback(async () => {
+    const data = await apiFetch('/pomodoro/start', {
+      method: 'POST',
+      body: JSON.stringify({ tipo: 'FOCUS' }),
+    })
+    if (data.erro) {
+      setMessage('Erro ao iniciar sessão: ' + data.erro)
+      return
+    }
+    setSessionId(data.id)
+    const rem = data.tempoRestanteSegundos ?? getDuration('focus')
+    timerFinishedRef.current = false
+    setRemaining(rem)
+    totalRef.current = getDuration('focus')
+    if (rem > 0) {
+      setStatus('running')
+      if (data.recuperada) {
+        setRecovered(true)
+        setMessage('Sessão recuperada! Você tem ' + Math.ceil(rem / 60) + ' minutos restantes.')
+      }
+    } else {
+      setStatus('completed')
+      setMessage('Foco já concluído! Clique em Finalizar para receber suas recompensas.')
+    }
   }, [])
 
-  useEffect(() => {
-    const t = tempoDoModo(modoAtual)
-    setMinutos(t.minutos)
-    setSegundos(t.segundos)
-    totalSegundosRef.current = t.total
-  }, [modoAtual])
+  const startLocalTimer = useCallback(() => {
+    timerFinishedRef.current = false
+    setStatus('running')
+  }, [])
 
+  const finishFocusSession = useCallback(async () => {
+    tocarSom()
+    const data = await apiFetch('/pomodoro/finish', { method: 'POST' })
+    if (data.erro) {
+      setMessage('Erro ao finalizar: ' + data.erro)
+      setStatus('idle')
+      return
+    }
+
+    ganharMacas(5)
+    const n = cycleRef.current + 1
+    setCycleCount(n)
+    const prox = proximoModo(n)
+    setMode(prox)
+    setSessionId(null)
+    setStatus('idle')
+    const dur = getDuration(prox)
+    setRemaining(dur)
+    totalRef.current = dur
+
+    let msg = `Foco concluído! +${data.pontosGanhos} pontos`
+    if (data.tomatesGanhos > 0) msg += `, +${data.tomatesGanhos} tomates`
+    if (n % TOTAL_CYCLES === 0) {
+      msg += `. Você completou ${TOTAL_CYCLES} ciclos! Aproveite sua pausa longa`
+    } else {
+      msg += '. Hora de uma pausa curta'
+    }
+    setMessage(msg)
+    fetchTreeData()
+  }, [tocarSom, fetchTreeData])
+
+  const handleFocusCompleteLocal = useCallback(() => {
+    tocarSom()
+    const n = cycleRef.current + 1
+    setCycleCount(n)
+    const prox = proximoModo(n)
+    setMode(prox)
+    setStatus('idle')
+    const dur = getDuration(prox)
+    setRemaining(dur)
+    totalRef.current = dur
+    ganharMacas(5)
+    if (n % TOTAL_CYCLES === 0) {
+      setMessage(`Você completou ${TOTAL_CYCLES} ciclos! Aproveite sua pausa longa`)
+    } else {
+      setMessage('Foco concluído! Hora de uma pausa curta')
+    }
+  }, [tocarSom])
+
+  const handleBreakComplete = useCallback(() => {
+    tocarSom()
+    setMode('focus')
+    setStatus('idle')
+    const dur = FOCUS_MIN * 60
+    setRemaining(dur)
+    totalRef.current = dur
+    setMessage(cycleRef.current === 0 ? 'Pausa concluída! Hora de focar' : 'Descansou bem? Hora de focar')
+  }, [tocarSom])
+
+  const resetTimer = useCallback(async () => {
+    if (status === 'running' || status === 'paused') {
+      if (isAuthed && sessionId) {
+        await apiFetch('/pomodoro/reset', { method: 'POST' })
+      }
+      setSessionId(null)
+    }
+    setStatus('idle')
+    setRemaining(FOCUS_MIN * 60)
+    totalRef.current = FOCUS_MIN * 60
+    setMode('focus')
+    setCycleCount(0)
+    setApples(0)
+    localStorage.setItem('macas', 0)
+    setRecovered(false)
+    timerFinishedRef.current = false
+  }, [isAuthed, status, sessionId])
+
+  // --- Recovery + failure detection on mount ---
   useEffect(() => {
-    if (!ativo) return
-    const intervalo = setInterval(() => {
-      setSegundos((prev) => {
-        if (prev > 0) return prev - 1
-        setMinutos((prevMin) => {
-          if (prevMin > 0) return prevMin - 1
-          clearInterval(intervalo)
-          setAtivo(false)
-          setIniciado(false)
-          tocarSom()
-          if (modoAtual === 'foco') {
-            setCiclosCompletos((ciclos) => {
-              const n = ciclos + 1
-              salvarPontos()
-              ganharMacas(MACAS_POR_CICLO)
-              if (n % TOTAL_CICLOS === 0) {
-                setMensagem(`Voce completou ${TOTAL_CICLOS} ciclos! Aproveite sua pausa longa`)
-              } else {
-                setMensagem('Foco concluido! Voce ganhou macas! Hora de uma pausa curta')
-              }
-              setModoAtual(proximoModo(n))
-              return n
-            })
-            return 0
-          }
-          if (modoAtual === 'pausaLonga') {
-            setMensagem('Descansou bem? Vamos mais 4 ciclos')
-            setCiclosCompletos(0)
-            setMacas(0)
-            localStorage.setItem('macas', 0)
+    if (isAuthed && !hasAttemptedRecovery.current) {
+      hasAttemptedRecovery.current = true
+      apiFetch('/pomodoro/current').then((data) => {
+        if (data && !data.erro && data.id) {
+          const rem = data.tempoRestanteSegundos ?? 0
+          setSessionId(data.id)
+          setRemaining(rem)
+          totalRef.current = FOCUS_MIN * 60
+          setRecovered(true)
+          if (rem > 0) {
+            setStatus('running')
+            setMessage('Sessão recuperada! Você tem ' + Math.ceil(rem / 60) + ' minutos restantes.')
           } else {
-            setMensagem('Pausa concluida! Hora de focar')
+            setStatus('completed')
+            setMessage('Foco já concluído! Clique em Finalizar para receber suas recompensas.')
           }
-          setModoAtual('foco')
+        } else {
+          apiFetch('/pomodoro/progresso').then((p) => {
+            if (p && !p.erro) {
+              setProgresso(p)
+              setTreeData({
+                estagio: p.arvoreEstagio,
+                morta: p.arvoreMorta,
+                focosCompletos: p.focosCompletos,
+              })
+              if (p.arvoreMorta) {
+                setMessage('Sessão anterior falhou por abandono. Sua árvore morreu. Inicie um novo foco para plantar uma nova.')
+              }
+            }
+          })
+        }
+      }).catch(() => { })
+    }
+  }, [isAuthed])
+
+  // --- Fetch tree data on mount ---
+  useEffect(() => {
+    fetchTreeData()
+  }, [fetchTreeData])
+
+  // --- Countdown interval (runs only in 'running' status) ---
+  useEffect(() => {
+    if (status !== 'running') return
+    timerFinishedRef.current = false
+    const id = setInterval(() => {
+      setRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(id)
           return 0
-        })
-        return 59
+        }
+        return prev - 1
       })
     }, 1000)
-    return () => clearInterval(intervalo)
-  }, [ativo, modoAtual, tocarSom, salvarPontos])
+    intervalRef.current = id
+    return () => clearInterval(id)
+  }, [status])
 
-  const restantes = minutos * 60 + segundos
-  const progresso = totalSegundosRef.current > 0 ? restantes / totalSegundosRef.current : 1
-  const offset = CIRCUNFERENCIA * (1 - progresso)
-  const W = 240
-  const H = 130
-  const CX = W / 2
-  const CY = H
+  // --- Detect when timer reaches 0 ---
+  useEffect(() => {
+    if (status !== 'running' || remaining > 0 || timerFinishedRef.current) return
+    timerFinishedRef.current = true
+
+    if (mode === 'focus') {
+      if (isAuthed) {
+        tocarSom()
+        setStatus('completed')
+        setMessage('Foco concluído! Clique em Finalizar para receber suas recompensas.')
+      } else {
+        handleFocusCompleteLocal()
+      }
+    } else {
+      handleBreakComplete()
+    }
+  }, [remaining, status, mode, isAuthed, tocarSom, handleFocusCompleteLocal, handleBreakComplete])
+
+  const restantes = remaining
+  const progressoAtual = totalRef.current > 0 ? restantes / totalRef.current : 1
+  const offset = CIRCUNFERENCIA * (1 - progressoAtual)
+
+  const treeEmoji = () => {
+    if (!treeData) return '🌱'
+    if (treeData.morta) return '💀'
+    if (treeData.estagio === 'TREE') return '🌳'
+    if (treeData.estagio === 'SEEDLING') return '🌿'
+    return '🌱'
+  }
+
+  const treeLabel = () => {
+    if (!treeData) return 'Semente'
+    if (treeData.morta) return 'Morta'
+    if (treeData.estagio === 'TREE') return 'Árvore'
+    if (treeData.estagio === 'SEEDLING') return 'Muda'
+    return 'Semente'
+  }
 
   return (
     <div className="pomodoro-page" style={{ position: 'relative' }}>
@@ -204,14 +353,8 @@ export default function Pomodoro() {
           transition: background 0.2s;
         }
 
-        .botao-arvore:hover {
-          background: #6e1010;
-        }
-
-        .botao-arvore:active {
-          background: #4a0b0b;
-          transform: translateY(1px);
-        }
+        .botao-arvore:hover { background: #6e1010; }
+        .botao-arvore:active { background: #4a0b0b; transform: translateY(1px); }
 
         .botao-arvore-icone {
           writing-mode: vertical-rl;
@@ -224,9 +367,7 @@ export default function Pomodoro() {
           line-height: 1;
         }
 
-        .botao-arvore:hover .botao-arvore-icone {
-          color: rgba(255,255,255,1);
-        }
+        .botao-arvore:hover .botao-arvore-icone { color: rgba(255,255,255,1); }
 
         .arvore-painel {
           width: 0;
@@ -244,12 +385,52 @@ export default function Pomodoro() {
             0 0 40px 10px rgba(0,0,0,0.08);
         }
 
-        .arvore-painel.aberto {
-          width: 260px;
+        .arvore-painel.aberto { width: 260px; }
+
+        .arvore-conteudo {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          padding: 20px;
+          color: white;
+          text-align: center;
         }
+
+        .arvore-icone-grande {
+          font-size: 4rem;
+          line-height: 1;
+        }
+
+        .arvore-label {
+          font-size: 1.1rem;
+          font-weight: 700;
+        }
+
+        .arvore-stats {
+          font-size: 0.85rem;
+          color: rgba(255,255,255,0.65);
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .arvore-stats span {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .arvore-stats .valor {
+          color: white;
+          font-weight: 600;
+        }
+
+        .arvore-morta { color: #ff6b6b; }
+        .arvore-viva { color: #4caf50; }
       `}</style>
 
-      {/* Contador de maçãs */}
+      {/* Apple counter */}
       <div style={{
         position: 'absolute',
         top: '12px',
@@ -259,9 +440,9 @@ export default function Pomodoro() {
         gap: '8px',
         fontSize: '1.2rem'
       }}>
-        <span>🍎</span>
+        <span style={{ fontSize: '1.3rem' }}>🍎</span>
         <span style={{ color: 'rgba(255,255,255,0.5)' }}>:</span>
-        <span style={{ fontWeight: 'bold' }}>{macas}</span>
+        <span style={{ fontWeight: 'bold' }}>{apples}</span>
         {animacao && (
           <span style={{
             position: 'absolute',
@@ -280,30 +461,44 @@ export default function Pomodoro() {
         )}
       </div>
 
-      {/* Saudação */}
+      {/* Recovery badge */}
+      {recovered && (
+        <div style={{
+          position: 'absolute',
+          top: '12px',
+          left: '24px',
+          background: '#ffc107',
+          color: '#000',
+          padding: '4px 12px',
+          borderRadius: '20px',
+          fontSize: '0.8rem',
+          fontWeight: 'bold',
+        }}>
+          ↩ Sessão recuperada
+        </div>
+      )}
 
-
-      {/* Card + botão + painel árvore */}
+      {/* Card + tree panel */}
       <div className="card-wrapper">
 
-        {/* Card do timer */}
+        {/* Timer card */}
         <div className="timer-card">
 
-          {/* Arco meia lua */}
+          {/* SVG arc */}
           <div style={{ position: 'relative', width: `${W}px`, margin: '-20px auto 2px' }}>
             <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
               <path
                 d={`M ${CX - RAIO} ${CY} A ${RAIO} ${RAIO} 0 0 1 ${CX + RAIO} ${CY}`}
                 fill="none"
-                stroke={COR_TRILHA}
-                strokeWidth={ESPESSURA_ARCO}
+                stroke="rgba(30,20,20,0.55)"
+                strokeWidth={5}
                 strokeLinecap="round"
               />
               <path
                 d={`M ${CX - RAIO} ${CY} A ${RAIO} ${RAIO} 0 0 1 ${CX + RAIO} ${CY}`}
                 fill="none"
-                stroke={COR_ARCO}
-                strokeWidth={ESPESSURA_ARCO}
+                stroke="#FFFFFF"
+                strokeWidth={5}
                 strokeLinecap="round"
                 strokeDasharray={CIRCUNFERENCIA}
                 strokeDashoffset={offset}
@@ -315,7 +510,7 @@ export default function Pomodoro() {
               bottom: '0px',
               left: '50%',
               transform: 'translateX(-50%)',
-              fontSize: TAMANHO_TIMER,
+              fontSize: '3.7rem',
               fontWeight: '700',
               fontFamily: '"Share Tech Mono", "Courier New", monospace',
               color: 'white',
@@ -323,39 +518,41 @@ export default function Pomodoro() {
               whiteSpace: 'nowrap',
               letterSpacing: '2px'
             }}>
-              {String(minutos).padStart(2, '0')}:{String(segundos).padStart(2, '0')}
+              {String(Math.floor(restantes / 60)).padStart(2, '0')}:
+              {String(restantes % 60).padStart(2, '0')}
             </div>
           </div>
 
-          {/* Label do modo */}
-          <p style={{ fontSize: TAMANHO_LABEL, margin: '6px 0 10px', fontWeight: '600' }}>
-            {labelDoModo(modoAtual)}
+          {/* Mode label */}
+          <p style={{ fontSize: '1.1rem', margin: '6px 0 10px', fontWeight: '600' }}>
+            {labelDoModo(mode)}
           </p>
 
-          {/* Bolinhas de ciclo */}
+          {/* Cycle dots */}
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', margin: '4px 0' }}>
-            {Array.from({ length: TOTAL_CICLOS }).map((_, i) => (
+            {Array.from({ length: TOTAL_CYCLES }).map((_, i) => (
               <div key={i} style={{
                 width: '13px',
                 height: '13px',
                 borderRadius: '50%',
-                backgroundColor: i < ciclosCompletos % TOTAL_CICLOS ? '#4caf50' : 'transparent',
+                backgroundColor: i < cycleCount % TOTAL_CYCLES ? '#4caf50' : 'transparent',
                 border: '2px solid',
-                borderColor: i < ciclosCompletos % TOTAL_CICLOS ? '#4caf50' : 'rgba(255,255,255,0.35)',
+                borderColor: i < cycleCount % TOTAL_CYCLES ? '#4caf50' : 'rgba(255,255,255,0.35)',
                 transition: 'all 0.3s ease'
               }} />
             ))}
           </div>
 
           <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>
-            {ciclosCompletos % TOTAL_CICLOS}/{TOTAL_CICLOS} ciclos completos
+            {cycleCount % TOTAL_CYCLES}/{TOTAL_CYCLES} ciclos completos
           </p>
 
-          {/* Botões */}
+          {/* Buttons */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
-            {!iniciado ? (
+
+            {status === 'idle' && (
               <button
-                onClick={() => { setMensagem(''); setAtivo(true); setIniciado(true) }}
+                onClick={mode === 'focus' && isAuthed ? startFocusSession : startLocalTimer}
                 style={{
                   padding: '10px 28px',
                   fontSize: '1rem',
@@ -366,12 +563,31 @@ export default function Pomodoro() {
                   borderRadius: '5px',
                   cursor: 'pointer'
                 }}>
-                {modoAtual === 'foco' ? 'Iniciar Foco' : 'Iniciar Pausa'}
+                {mode === 'focus' ? 'Iniciar Foco' : 'Iniciar ' + (mode === 'shortBreak' ? 'Pausa Curta' : 'Pausa Longa')}
               </button>
-            ) : (
+            )}
+
+            {status === 'completed' && isAuthed && (
+              <button
+                onClick={finishFocusSession}
+                style={{
+                  padding: '10px 28px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}>
+                Finalizar e Receber Recompensas
+              </button>
+            )}
+
+            {(status === 'running' || status === 'paused') && (
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                 <button
-                  onClick={reiniciar}
+                  onClick={resetTimer}
                   style={{
                     padding: '10px 28px',
                     fontSize: '1rem',
@@ -385,53 +601,74 @@ export default function Pomodoro() {
                   Reiniciar
                 </button>
                 <button
-                  onClick={() => setAtivo((a) => !a)}
+                  onClick={() => setStatus((s) => s === 'running' ? 'paused' : 'running')}
                   style={{
                     padding: '10px 28px',
                     fontSize: '1rem',
                     fontWeight: 'bold',
-                    backgroundColor: ativo ? '#ffc107' : '#28a745',
+                    backgroundColor: status === 'running' ? '#ffc107' : '#28a745',
                     color: 'white',
                     border: 'none',
                     borderRadius: '5px',
                     cursor: 'pointer'
                   }}>
-                  {ativo ? 'Pausar' : 'Retomar'}
+                  {status === 'running' ? 'Pausar' : 'Retomar'}
                 </button>
               </div>
             )}
-          </div>
 
+          </div>
         </div>
 
-        {/* Botão ||> lateral */}
+        {/* Tree toggle button */}
         <button
           className="botao-arvore"
-          onClick={() => setArvoreAberta((a) => !a)}
-          title={arvoreAberta ? 'Fechar árvore' : 'Ver árvore'}
+          onClick={() => setShowTreePanel((a) => !a)}
+          title={showTreePanel ? 'Fechar árvore' : 'Ver árvore'}
         >
           <span className="botao-arvore-icone">
-            {arvoreAberta ? '◀  ||' : '||  ▶'}
+            {showTreePanel ? '◀  ||' : '||  ▶'}
           </span>
         </button>
 
-        {/* Painel da árvore */}
-        <div className={`arvore-painel ${arvoreAberta ? 'aberto' : ''}`}>
-          <p style={{
-            color: 'rgba(255,255,255,0.3)',
-            fontSize: '0.85rem',
-            textAlign: 'center',
-            padding: '16px',
-            whiteSpace: 'nowrap'
-          }}>
-            🌱 Árvore em breve
-          </p>
+        {/* Tree panel */}
+        <div className={`arvore-painel ${showTreePanel ? 'aberto' : ''}`}>
+          {isAuthed ? (
+            <div className="arvore-conteudo">
+              <div className="arvore-icone-grande">
+                {treeEmoji()}
+              </div>
+              <div className={`arvore-label ${treeData?.morta ? 'arvore-morta' : 'arvore-viva'}`}>
+                {treeLabel()}
+              </div>
+              {treeData?.morta && (
+                <div style={{ color: '#ff6b6b', fontSize: '0.85rem', fontWeight: 600 }}>
+                  Sua árvore morreu por abandono. Inicie um novo foco para plantar uma nova.
+                </div>
+              )}
+              <div className="arvore-stats">
+                <span>Focos completos: <span className="valor">{treeData?.focosCompletos ?? 0}</span></span>
+                <span>Pontos: <span className="valor">{progresso?.pontos ?? 0}</span></span>
+                <span>Tomates: <span className="valor">{progresso?.tomates ?? 0}</span></span>
+              </div>
+            </div>
+          ) : (
+            <p style={{
+              color: 'rgba(255,255,255,0.3)',
+              fontSize: '0.85rem',
+              textAlign: 'center',
+              padding: '16px',
+              whiteSpace: 'nowrap'
+            }}>
+              Faça login para ter sua árvore
+            </p>
+          )}
         </div>
 
       </div>
 
-      {/* Mensagem de fase */}
-      {mensagem && (
+      {/* Message toast */}
+      {message && (
         <div style={{
           position: 'fixed',
           top: '25px',
@@ -453,11 +690,11 @@ export default function Pomodoro() {
             textAlign: 'left',
             lineHeight: '1.4'
           }}>
-            {mensagem}
+            {message}
           </p>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button
-              onClick={() => setMensagem('')}
+              onClick={() => { setMessage(''); setRecovered(false) }}
               style={{
                 background: '#c62828',
                 color: 'white',
