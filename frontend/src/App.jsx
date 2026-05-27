@@ -30,7 +30,7 @@ export default function App() {
               <Route path="/cadastro" element={<Register />} />
               <Route path="/esqueci-senha" element={<ForgotPassword />} />
               <Route path="/guia" element={<Guide />} />
-              <Route path="/pomodoro" element={<RotaProtegida><Pomodoro /></RotaProtegida>} />
+              <Route path="/pomodoro" element={<Pomodoro />} />
               <Route path="/ranking" element={<RotaProtegida><Ranking /></RotaProtegida>} />
               <Route path="/perfil" element={<RotaProtegida><Profile /></RotaProtegida>} />
               <Route path="/configuracoes" element={<RotaProtegida><Settings /></RotaProtegida>} />

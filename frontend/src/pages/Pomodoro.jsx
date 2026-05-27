@@ -167,7 +167,6 @@ export default function Pomodoro() {
     const dur = getDuration(prox)
     setRemaining(dur)
     totalRef.current = dur
-    ganharMacas(5)
     if (n % TOTAL_CYCLES === 0) {
       setMessage(`Você completou ${TOTAL_CYCLES} ciclos! Aproveite sua pausa longa`)
     } else {
@@ -197,8 +196,10 @@ export default function Pomodoro() {
     totalRef.current = FOCUS_MIN * 60
     setMode('focus')
     setCycleCount(0)
-    setApples(0)
-    localStorage.setItem('macas', 0)
+    if (isAuthed) {
+      setApples(0)
+      localStorage.setItem('macas', 0)
+    }
     setRecovered(false)
     timerFinishedRef.current = false
   }, [isAuthed, status, sessionId])
@@ -431,35 +432,37 @@ export default function Pomodoro() {
       `}</style>
 
       {/* Apple counter */}
-      <div style={{
-        position: 'absolute',
-        top: '12px',
-        right: '24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        fontSize: '1.2rem'
-      }}>
-        <span style={{ fontSize: '1.3rem' }}>🍎</span>
-        <span style={{ color: 'rgba(255,255,255,0.5)' }}>:</span>
-        <span style={{ fontWeight: 'bold' }}>{apples}</span>
-        {animacao && (
-          <span style={{
-            position: 'absolute',
-            top: '-50px',
-            right: '-10px',
-            color: '#FFD700',
-            fontWeight: '900',
-            fontSize: '1.3rem',
-            zIndex: '9999',
-            textShadow: '0 0 5px rgba(255,215,0,0.8), 0 0 10px rgba(255,215,0,0.6), 2px 2px 0 #000',
-            animation: 'subirSumir 3s ease-out forwards',
-            pointerEvents: 'none'
-          }}>
-            +{animacao} 🍎
-          </span>
-        )}
-      </div>
+      {isAuthed && (
+        <div style={{
+          position: 'absolute',
+          top: '12px',
+          right: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontSize: '1.2rem'
+        }}>
+          <span style={{ fontSize: '1.3rem' }}>🍎</span>
+          <span style={{ color: 'rgba(255,255,255,0.5)' }}>:</span>
+          <span style={{ fontWeight: 'bold' }}>{apples}</span>
+          {animacao && (
+            <span style={{
+              position: 'absolute',
+              top: '-50px',
+              right: '-10px',
+              color: '#FFD700',
+              fontWeight: '900',
+              fontSize: '1.3rem',
+              zIndex: '9999',
+              textShadow: '0 0 5px rgba(255,215,0,0.8), 0 0 10px rgba(255,215,0,0.6), 2px 2px 0 #000',
+              animation: 'subirSumir 3s ease-out forwards',
+              pointerEvents: 'none'
+            }}>
+              +{animacao} 🍎
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Recovery badge */}
       {recovered && (
