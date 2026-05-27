@@ -2,6 +2,7 @@ package com.pomodoro.service;
 
 import com.pomodoro.model.Usuario;
 import com.pomodoro.repository.UsuarioRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +11,11 @@ import java.util.Optional;
 public class UsuarioService {
 
   private final UsuarioRepository usuarioRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
 
-  public UsuarioService(UsuarioRepository usuarioRepository) {
+  public UsuarioService(UsuarioRepository usuarioRepository, BCryptPasswordEncoder passwordEncoder) {
     this.usuarioRepository = usuarioRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   public List<Usuario> obterTopRanking() {
@@ -30,12 +33,16 @@ public class UsuarioService {
     if (usuarioRepository.findByEmail(email).isPresent()) {
       throw new RuntimeException("Este e-mail já está cadastrado.");
     }
-    Usuario novoUsuario = new Usuario(nome, email, senha);
+    Usuario novoUsuario = new Usuario(nome, email, passwordEncoder.encode(senha));
     return usuarioRepository.save(novoUsuario);
   }
 
   public Optional<Usuario> login(String email, String senha) {
-    return usuarioRepository.findByEmailAndSenha(email, senha);
+    Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+    if (usuarioOpt.isPresent() && passwordEncoder.matches(senha, usuarioOpt.get().getSenha())) {
+      return usuarioOpt;
+    }
+    return Optional.empty();
   }
 
   public Optional<Usuario> buscarPorId(Long id) {
@@ -45,7 +52,7 @@ public class UsuarioService {
   public void redefinirSenha(String email, String novaSenha) {
     Usuario usuario = usuarioRepository.findByEmail(email)
       .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-    usuario.setSenha(novaSenha);
+    usuario.setSenha(passwordEncoder.encode(novaSenha));
     usuarioRepository.save(usuario);
   }
 
@@ -58,7 +65,7 @@ public class UsuarioService {
     usuario.setNome(nome);
     usuario.setEmail(email);
     if (senha != null && !senha.isBlank()) {
-      usuario.setSenha(senha);
+      usuario.setSenha(passwordEncoder.encode(senha));
     }
     return usuarioRepository.save(usuario);
   }
