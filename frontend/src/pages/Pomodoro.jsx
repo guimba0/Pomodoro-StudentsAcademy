@@ -3,17 +3,21 @@ import { useAuth } from '../contexts/AuthContext'
 import { apiFetch } from '../api/api'
 import useTitle from '../hooks/useTitle'
 
-const FOCUS_MIN = 25
-const SHORT_BREAK_MIN = 5
-const LONG_BREAK_MIN = 15
+const TEST_SECONDS = 5
 const TOTAL_CYCLES = 4
 
 const RAIO = 110
-const CIRCUNFERENCIA = Math.PI * RAIO
+const CIRCUNFERENCIA = Math.PI * RAIO + 2
 const W = 240
 const H = 130
 const CX = W / 2
 const CY = H
+
+const getDuration = (m) => {
+  if (m === 'focus') return TEST_SECONDS
+  if (m === 'shortBreak') return TEST_SECONDS
+  return 2
+}
 
 export default function Pomodoro() {
   useTitle('Timer Pomodoro')
@@ -21,7 +25,7 @@ export default function Pomodoro() {
   const isAuthed = !!user
 
   const [status, setStatus] = useState('idle')
-  const [remaining, setRemaining] = useState(FOCUS_MIN * 60)
+  const [remaining, setRemaining] = useState(TEST_SECONDS)
   const [mode, setMode] = useState('focus')
   const [sessionId, setSessionId] = useState(null)
   const [cycleCount, setCycleCount] = useState(0)
@@ -33,19 +37,13 @@ export default function Pomodoro() {
   const [animacao, setAnimacao] = useState(null)
   const [treeData, setTreeData] = useState(null)
 
-  const totalRef = useRef(FOCUS_MIN * 60)
+  const totalRef = useRef(TEST_SECONDS)
   const hasAttemptedRecovery = useRef(false)
   const intervalRef = useRef(null)
   const timerFinishedRef = useRef(false)
   const cycleRef = useRef(0)
 
   useEffect(() => { cycleRef.current = cycleCount }, [cycleCount])
-
-  const getDuration = (m) => {
-    if (m === 'focus') return FOCUS_MIN * 60
-    if (m === 'shortBreak') return SHORT_BREAK_MIN * 60
-    return LONG_BREAK_MIN * 60
-  }
 
   const labelDoModo = (m) => {
     if (m === 'focus') return 'Tempo de Foco'
@@ -101,24 +99,22 @@ export default function Pomodoro() {
       return
     }
     setSessionId(data.id)
-    const rem = data.tempoRestanteSegundos ?? getDuration('focus')
+    const duracao = getDuration('focus')
     timerFinishedRef.current = false
-    setRemaining(rem)
-    totalRef.current = getDuration('focus')
-    if (rem > 0) {
-      setStatus('running')
-      if (data.recuperada) {
-        setRecovered(true)
-        setMessage('Sessão recuperada! Você tem ' + Math.ceil(rem / 60) + ' minutos restantes.')
-      }
-    } else {
-      setStatus('completed')
-      setMessage('Foco já concluído! Clique em Finalizar para receber suas recompensas.')
+    setRemaining(duracao)
+    totalRef.current = duracao
+    setStatus('running')
+    if (data.recuperada) {
+      setRecovered(true)
+      setMessage('Sessão recuperada!')
     }
   }, [])
 
   const startLocalTimer = useCallback(() => {
     timerFinishedRef.current = false
+    const duracao = getDuration('focus')
+    setRemaining(duracao)
+    totalRef.current = duracao
     setStatus('running')
   }, [])
 
@@ -174,7 +170,7 @@ export default function Pomodoro() {
     tocarSom()
     setMode('focus')
     setStatus('idle')
-    const dur = FOCUS_MIN * 60
+    const dur = getDuration('focus')
     setRemaining(dur)
     totalRef.current = dur
     setMessage(cycleRef.current === 0 ? 'Pausa concluída! Hora de focar' : 'Descansou bem? Hora de focar')
@@ -187,36 +183,29 @@ export default function Pomodoro() {
       }
       setSessionId(null)
     }
+    const dur = getDuration('focus')
     setStatus('idle')
-    setRemaining(FOCUS_MIN * 60)
-    totalRef.current = FOCUS_MIN * 60
+    setRemaining(dur)
+    totalRef.current = dur
     setMode('focus')
     setCycleCount(0)
-    if (isAuthed) {
-      setTomateCount(0)
-    }
+    if (isAuthed) setTomateCount(0)
     setRecovered(false)
     timerFinishedRef.current = false
   }, [isAuthed, status, sessionId])
 
-  // --- Recovery + failure detection on mount ---
   useEffect(() => {
     if (isAuthed && !hasAttemptedRecovery.current) {
       hasAttemptedRecovery.current = true
       apiFetch('/pomodoro/current').then((data) => {
         if (data && !data.erro && data.id) {
-          const rem = data.tempoRestanteSegundos ?? 0
+          const duracao = getDuration('focus')
           setSessionId(data.id)
-          setRemaining(rem)
-          totalRef.current = FOCUS_MIN * 60
+          setRemaining(duracao)
+          totalRef.current = duracao
           setRecovered(true)
-          if (rem > 0) {
-            setStatus('running')
-            setMessage('Sessão recuperada! Você tem ' + Math.ceil(rem / 60) + ' minutos restantes.')
-          } else {
-            setStatus('completed')
-            setMessage('Foco já concluído! Clique em Finalizar para receber suas recompensas.')
-          }
+          setStatus('running')
+          setMessage('Sessão recuperada!')
         } else {
           apiFetch('/pomodoro/progresso').then((p) => {
             if (p && !p.erro) {
@@ -227,7 +216,7 @@ export default function Pomodoro() {
                 focosCompletos: p.focosCompletos,
               })
               if (p.arvoreMorta) {
-                setMessage('Sessão anterior falhou por abandono. Sua árvore morreu. Inicie um novo foco para plantar uma nova.')
+                setMessage('Sessão anterior falhou. Sua árvore morreu. Inicie um novo foco para plantar uma nova.')
               }
             }
           })
@@ -236,33 +225,36 @@ export default function Pomodoro() {
     }
   }, [isAuthed])
 
-  // --- Fetch tree data on mount ---
   useEffect(() => {
     fetchTreeData()
   }, [fetchTreeData])
 
-  // --- Countdown interval (runs only in 'running' status) ---
-  useEffect(() => {
-    if (status !== 'running') return
-    timerFinishedRef.current = false
-    const id = setInterval(() => {
-      setRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(id)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-    intervalRef.current = id
-    return () => clearInterval(id)
-  }, [status])
+  // ✅ CORREÇÃO 1 — interval para em 1, não em 0
+ useEffect(() => {
+   if (status !== 'running') return
 
-  // --- Detect when timer reaches 0 ---
+   timerFinishedRef.current = false
+
+   const id = setInterval(() => {
+     setRemaining((prev) => {
+       if (prev <= 1) {
+         clearInterval(id)
+         return 0
+       }
+
+       return prev - 1
+     })
+   }, 1000)
+
+   intervalRef.current = id
+
+   return () => clearInterval(id)
+ }, [status])
+
+  // ✅ CORREÇÃO 2 — detecta fim quando remaining === 1
   useEffect(() => {
-    if (status !== 'running' || remaining > 0 || timerFinishedRef.current) return
+      if (status !== 'running' || remaining > 0 || timerFinishedRef.current) return
     timerFinishedRef.current = true
-
     if (mode === 'focus') {
       if (isAuthed) {
         tocarSom()
@@ -276,8 +268,7 @@ export default function Pomodoro() {
     }
   }, [remaining, status, mode, isAuthed, tocarSom, handleFocusCompleteLocal, handleBreakComplete])
 
-  const restantes = remaining
-  const progressoAtual = totalRef.current > 0 ? restantes / totalRef.current : 1
+  const progressoAtual = status === 'idle' ? 1 : (totalRef.current > 0 ? remaining / totalRef.current : 1)
   const offset = CIRCUNFERENCIA * (1 - progressoAtual)
 
   const treeEmoji = () => {
@@ -309,12 +300,10 @@ export default function Pomodoro() {
           0%   { opacity: 0; transform: translateX(-50%) translateY(-40px); }
           100% { opacity: 1; transform: translateX(-50%) translateY(0px); }
         }
-
         .card-wrapper {
           display: flex;
           align-items: stretch;
         }
-
         .timer-card {
           background: var(--color-primary-dark);
           border-radius: 24px 0 0 24px;
@@ -329,7 +318,6 @@ export default function Pomodoro() {
             0 0 40px 10px rgba(0,0,0,0.08);
           min-width: 300px;
         }
-
         .botao-arvore {
           display: flex;
           align-items: center;
@@ -348,10 +336,8 @@ export default function Pomodoro() {
             0 0 40px 10px rgba(0,0,0,0.08);
           transition: background 0.2s;
         }
-
         .botao-arvore:hover { background: #6e1010; }
         .botao-arvore:active { background: #4a0b0b; transform: translateY(1px); }
-
         .botao-arvore-icone {
           writing-mode: vertical-rl;
           color: rgba(255,255,255,0.75);
@@ -362,9 +348,7 @@ export default function Pomodoro() {
           transition: color 0.2s;
           line-height: 1;
         }
-
         .botao-arvore:hover .botao-arvore-icone { color: rgba(255,255,255,1); }
-
         .arvore-painel {
           width: 0;
           overflow: hidden;
@@ -380,9 +364,7 @@ export default function Pomodoro() {
             0 0 20px 6px rgba(0,0,0,0.15),
             0 0 40px 10px rgba(0,0,0,0.08);
         }
-
         .arvore-painel.aberto { width: 260px; }
-
         .arvore-conteudo {
           display: flex;
           flex-direction: column;
@@ -392,17 +374,8 @@ export default function Pomodoro() {
           color: white;
           text-align: center;
         }
-
-        .arvore-icone-grande {
-          font-size: 4rem;
-          line-height: 1;
-        }
-
-        .arvore-label {
-          font-size: 1.1rem;
-          font-weight: 700;
-        }
-
+        .arvore-icone-grande { font-size: 4rem; line-height: 1; }
+        .arvore-label { font-size: 1.1rem; font-weight: 700; }
         .arvore-stats {
           font-size: 0.85rem;
           color: rgba(255,255,255,0.65);
@@ -410,23 +383,16 @@ export default function Pomodoro() {
           flex-direction: column;
           gap: 4px;
         }
-
         .arvore-stats span {
           display: flex;
           justify-content: space-between;
           gap: 12px;
         }
-
-        .arvore-stats .valor {
-          color: white;
-          font-weight: 600;
-        }
-
+        .arvore-stats .valor { color: white; font-weight: 600; }
         .arvore-morta { color: #ff6b6b; }
         .arvore-viva { color: #4caf50; }
       `}</style>
 
-      {/* Tomato counter */}
       {isAuthed && (
         <div style={{
           position: 'absolute',
@@ -459,7 +425,6 @@ export default function Pomodoro() {
         </div>
       )}
 
-      {/* Recovery badge */}
       {recovered && (
         <div style={{
           position: 'absolute',
@@ -476,13 +441,9 @@ export default function Pomodoro() {
         </div>
       )}
 
-      {/* Card + tree panel */}
       <div className="card-wrapper">
-
-        {/* Timer card */}
         <div className="timer-card">
 
-          {/* SVG arc */}
           <div style={{ position: 'relative', width: `${W}px`, margin: '-20px auto 2px' }}>
             <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
               <path
@@ -500,7 +461,13 @@ export default function Pomodoro() {
                 strokeLinecap="round"
                 strokeDasharray={CIRCUNFERENCIA}
                 strokeDashoffset={offset}
-                style={{ transition: 'stroke-dashoffset 1s linear' }}
+              style={{
+                transition: status === 'running'
+                  ? 'stroke-dashoffset 1s linear'
+                  : 'none'
+                  ? 'stroke-dashoffset 0.3s linear'
+                  : 'none'
+              }}
               />
             </svg>
             <div style={{
@@ -516,17 +483,15 @@ export default function Pomodoro() {
               whiteSpace: 'nowrap',
               letterSpacing: '2px'
             }}>
-              {String(Math.floor(restantes / 60)).padStart(2, '0')}:
-              {String(restantes % 60).padStart(2, '0')}
+              {String(Math.floor(remaining / 60)).padStart(2, '0')}:
+              {String(remaining % 60).padStart(2, '0')}
             </div>
           </div>
 
-          {/* Mode label */}
           <p style={{ fontSize: '1.1rem', margin: '6px 0 10px', fontWeight: '600' }}>
             {labelDoModo(mode)}
           </p>
 
-          {/* Cycle dots */}
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', margin: '4px 0' }}>
             {Array.from({ length: TOTAL_CYCLES }).map((_, i) => (
               <div key={i} style={{
@@ -545,7 +510,6 @@ export default function Pomodoro() {
             {cycleCount % TOTAL_CYCLES}/{TOTAL_CYCLES} ciclos completos
           </p>
 
-          {/* Buttons */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
 
             {status === 'idle' && (
@@ -591,7 +555,6 @@ export default function Pomodoro() {
           </div>
         </div>
 
-        {/* Tree toggle button */}
         <button
           className="botao-arvore"
           onClick={() => setShowTreePanel((a) => !a)}
@@ -602,13 +565,10 @@ export default function Pomodoro() {
           </span>
         </button>
 
-        {/* Tree panel */}
         <div className={`arvore-painel ${showTreePanel ? 'aberto' : ''}`}>
           {isAuthed ? (
             <div className="arvore-conteudo">
-              <div className="arvore-icone-grande">
-                {treeEmoji()}
-              </div>
+              <div className="arvore-icone-grande">{treeEmoji()}</div>
               <div className={`arvore-label ${treeData?.morta ? 'arvore-morta' : 'arvore-viva'}`}>
                 {treeLabel()}
               </div>
@@ -635,10 +595,8 @@ export default function Pomodoro() {
             </p>
           )}
         </div>
-
       </div>
 
-      {/* Message toast */}
       {message && (
         <div style={{
           position: 'fixed',
