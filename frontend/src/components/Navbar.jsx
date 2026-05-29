@@ -41,13 +41,16 @@ function Navbar() {
       </Link>
 
       <nav className="nav-links" aria-label="Navegação principal">
+        <Link to="/pomodoro" className="nav-link-guia">Timer</Link>
+
         {user && (
           <>
-            <Link to="/pomodoro" className="nav-link-guia">Timer</Link>
             <Link to="/ranking" className="nav-link-guia">Ranking</Link>
+            <Link to="/loja" className="nav-link-guia">Loja</Link>
           </>
         )}
-            <Link to="/guia" className="nav-link-guia">Guia</Link>
+
+        <Link to="/guia" className="nav-link-guia">Guia</Link>
       </nav>
 
       {user ? (

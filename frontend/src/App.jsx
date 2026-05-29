@@ -16,6 +16,7 @@ const Settings = lazy(() => import('./pages/Settings'))
 const Guide = lazy(() => import('./pages/Guide'))
 const Pomodoro = lazy(() => import('./pages/Pomodoro'))
 const Ranking = lazy(() => import('./pages/Ranking'))
+const Loja = lazy(() => import('./components/Loja/Loja'))
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
               <Route path="/esqueci-senha" element={<ForgotPassword />} />
               <Route path="/guia" element={<Guide />} />
               <Route path="/pomodoro" element={<Pomodoro />} />
+              <Route path="/loja" element={<Loja />} />
               <Route path="/ranking" element={<RotaProtegida><Ranking /></RotaProtegida>} />
               <Route path="/perfil" element={<RotaProtegida><Profile /></RotaProtegida>} />
               <Route path="/configuracoes" element={<RotaProtegida><Settings /></RotaProtegida>} />

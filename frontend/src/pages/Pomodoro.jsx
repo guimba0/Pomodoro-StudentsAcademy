@@ -299,8 +299,8 @@ export default function Pomodoro() {
        @keyframes subirSumir {
                  0%   { opacity: 0; transform: translateY(10px) scale(0.8); }
                  15%  { opacity: 1; transform: translateY(0px) scale(1.3); }
-                 60%  { opacity: 1; transform: translateY(-60px) scale(1.1); }
-                 100% { opacity: 0; transform: translateY(-160px) scale(1.0); }
+                 60%  { opacity: 1; transform: translateY(-50px) scale(1.0); }
+                 100% { opacity: 0; transform: translateY(-90px) scale(0.9); }
                }
         }
         @keyframes subirMensagem {
@@ -413,23 +413,24 @@ export default function Pomodoro() {
           <span style={{ fontSize: '1.3rem' }}>🍅</span>
           <span style={{ color: 'rgba(255,255,255,0.5)' }}>:</span>
           <span style={{ fontWeight: 'bold' }}>{tomateCount}</span>
-          {animacao && (
-            <span style={{
-              position: 'absolute',
-              top: '-50px',
-              right: '-10px',
-              color: '#FFD700',
-              fontWeight: '900',
-              fontSize: '1.3rem',
-              zIndex: '9999',
-              textShadow: '0 0 5px rgba(255,215,0,0.8), 0 0 10px rgba(255,215,0,0.6), 2px 2px 0 #000',
-              animation: 'subirSumir 5s ease-out forwards',
-
-              pointerEvents: 'none'
-            }}>
-              +{animação} 🍅
-            </span>
-          )}
+      {animacao && (
+        <span style={{
+          position: 'absolute',
+          top: '-20px',
+          right: '10px',
+          color: '#FFD700',
+          fontWeight: '900',
+          fontSize: '1.1rem',
+          zIndex: '9999',
+          textShadow: '0 0 5px rgba(255,215,0,0.8), 2px 2px 0 #000',
+          animation: 'subirSumir 4s ease-out forwards',
+          pointerEvents: 'none',
+          whiteSpace: 'nowrap',
+          display: 'inline-block'
+        }}>
+          +{animacao} 🍅
+        </span>
+      )}
         </div>
       )}
 
