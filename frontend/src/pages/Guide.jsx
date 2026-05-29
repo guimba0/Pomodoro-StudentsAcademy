@@ -17,7 +17,7 @@ const topics = [
           O próximo ciclo nunca inicia sozinho — você decide quando começar.
         </p>
         <div className="guide-example">
-          <strong>momomomo:</strong> 25min foco → 5min pausa → repita 4x → 15min pausa longa
+          25min foco → 5min pausa → repita 4x → 15min pausa longa
         </div>
       </>
     )
@@ -34,7 +34,7 @@ const topics = [
           <strong>Atenção:</strong> se você fechar a página durante o foco e não voltar em até <strong>120 segundos</strong>, a árvore morre e a sessão é perdida.
         </p>
         <div className="guide-example">
-          <strong>momomomo:</strong> semente (1 ciclo) → muda (5 ciclos) → árvore (20 ciclos)
+          semente (1 ciclo) → muda (5 ciclos) → árvore (20 ciclos)
         </div>
       </>
     )
@@ -51,7 +51,7 @@ const topics = [
           A cada <strong>5 minutos</strong> de foco, você recebe 1 <strong>tomate</strong> (moeda do sistema). Pausas não geram recompensas.
         </p>
         <div className="guide-example">
-          <strong>momomomo:</strong> 25min foco = 25 pontos + 5 tomate + bônus por conclusão
+          25min foco = 25 pontos + 5 tomate + bônus por conclusão
         </div>
       </>
     )
@@ -65,7 +65,7 @@ const topics = [
           Seus pontos são comparados com outros usuários no <strong>ranking global</strong>. Organizado por semana e mês, ele mostra quem está mais dedicado.
         </p>
         <div className="guide-example">
-          <strong>momomomo:</strong> ranking semanal: 1º lugar com 500 pontos
+          ranking semanal: 1º lugar com 500 pontos
         </div>
       </>
     )
@@ -84,7 +84,7 @@ const topics = [
           <Link to="/login">login</Link> para aproveitar ao máximo.
         </p>
         <div className="guide-example">
-          <strong>momomomo:</strong> visitante = sem progresso | logado = tudo salvo
+          visitante = sem progresso | logado = tudo salvo
         </div>
       </>
     )
