@@ -113,14 +113,14 @@ export default function Profile() {
                   margin: 0,
                   fontSize: '2rem',
                   fontWeight: 'bold',
-                  color: 'white'
+                  color: 'var(--color-text)'
                 }}>
                   {ofensiva}
                 </p>
 
                 <p style={{
                   margin: 0,
-                  color: 'rgba(255,255,255,0.65)'
+                  color: 'var(--color-text-muted)'
                 }}>
                   dias seguidos
                 </p>
@@ -193,14 +193,15 @@ export default function Profile() {
                         width: '10px',
                         height: '10px',
                         borderRadius: '50%',
-                        background: 'rgba(255,255,255,0.15)'
+                        background: 'var(--color-text-muted)',
+                        opacity: 0.25
                       }} />
                     )}
 
                   </div>
 
                   <span style={{
-                    color: 'rgba(255,255,255,0.55)',
+                    color: 'var(--color-text-muted)',
                     fontSize: '0.72rem',
                     fontWeight: '600'
                   }}>

@@ -44,7 +44,7 @@ export default function Loja() {
         /* SOLUÇÃO PARA O PRETO: Ocupa toda a altura da tela restante e pinta o fundo */
         .loja-outer-wrapper {
           width: 100%;
-          background: #A61D1D !important;
+          background: var(--color-page) !important;
           box-sizing: border-box;
           min-height: 100vh;
           padding: 45px 20px 60px 20px;

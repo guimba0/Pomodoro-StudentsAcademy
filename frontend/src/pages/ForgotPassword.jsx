@@ -37,56 +37,28 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div style={{ padding: '40px', maxWidth: '400px', margin: '0 auto', color: 'white' }}>
-      <div style={{ backgroundColor: '#7a1f1d', padding: '30px', borderRadius: '10px', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '20px' }}>Redefinir Senha</h2>
+    <main className="auth-page" style={{ minHeight: '100vh' }}>
+      <div className="auth-card" style={{ textAlign: 'center' }}>
+        <h1>Redefinir Senha</h1>
 
-        {erro && <div style={{ backgroundColor: '#ff6b6b', padding: '10px', borderRadius: '5px', marginBottom: '15px', fontSize: '0.9rem' }}>{erro}</div>}
-        {mensagem && <div style={{ backgroundColor: '#28a745', padding: '10px', borderRadius: '5px', marginBottom: '15px' }}>{mensagem}</div>}
+        {erro && <div className="auth-error">{erro}</div>}
+        {mensagem && <div className="auth-success">{mensagem}</div>}
 
-        <form onSubmit={handleRedefinirSenha} style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ width: '100%', padding: '10px', borderRadius: '5px', border: 'none', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white' }}
-            />
-          </div>
+        <form onSubmit={handleRedefinirSenha}>
+          <label htmlFor="emailReset">Email</label>
+          <input id="emailReset" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Nova senha</label>
-            <input
-              type="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              required
-              style={{ width: '100%', padding: '10px', borderRadius: '5px', border: 'none', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white' }}
-            />
-          </div>
+          <label htmlFor="novaSenha">Nova senha</label>
+          <input id="novaSenha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required />
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Confirmar senha</label>
-            <input
-              type="password"
-              value={confirmarSenha}
-              onChange={(e) => setConfirmarSenha(e.target.value)}
-              required
-              style={{ width: '100%', padding: '10px', borderRadius: '5px', border: 'none', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white' }}
-            />
-          </div>
+          <label htmlFor="confirmarSenha">Confirmar senha</label>
+          <input id="confirmarSenha" type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} required />
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{ width: '100%', padding: '12px', fontSize: '1.1rem', fontWeight: 'bold', backgroundColor: '#ff3b30', color: 'white', border: 'none', borderRadius: '5px', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, marginTop: '10px' }}
-          >
+          <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? 'Alterando...' : 'Redefinir Senha'}
           </button>
         </form>
       </div>
-    </div>
+    </main>
   )
 }

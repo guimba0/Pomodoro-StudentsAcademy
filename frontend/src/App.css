@@ -18,7 +18,11 @@ html, body {
   --color-accent: #f82b2b;
   --color-accent-dark: #d91f1f;
   --color-bg: #1a1a1a;
+  --color-page: var(--color-primary-dark);
+  --color-card: rgba(0, 0, 0, 0.3);
   --color-overlay: rgba(249, 54, 37, 0.7);
+  --color-input-bg: rgba(255, 255, 255, 0.1);
+  --color-input-border: rgba(255, 255, 255, 0.3);
   --color-text: #ffffff;
   --color-text-muted: rgba(255, 255, 255, 0.6);
   --color-text-muted-light: rgba(255, 255, 255, 0.7);
@@ -37,8 +41,12 @@ html, body {
   --color-accent: #e64a3a;
   --color-accent-dark: #cc3322;
   --color-bg: #f5f0eb;
+  --color-page: var(--color-bg);
+  --color-card: rgba(255, 255, 255, 0.6);
   --color-overlay: rgba(217, 58, 43, 0.08);
-  --color-text: #1a1a1a;
+  --color-input-bg: rgba(255, 255, 255, 0.8);
+  --color-input-border: rgba(0, 0, 0, 0.2);
+  --color-text: #000000;
   --color-text-muted: rgba(0, 0, 0, 0.5);
   --color-text-muted-light: rgba(0, 0, 0, 0.7);
   --color-focus: #4a90e2;
@@ -56,7 +64,11 @@ html, body {
   --color-accent: #a83228;
   --color-accent-dark: #8c281f;
   --color-bg: #0d0d0d;
+  --color-page: #2a0d08;
+  --color-card: rgba(255, 255, 255, 0.04);
   --color-overlay: rgba(0, 0, 0, 0.75);
+  --color-input-bg: rgba(255, 255, 255, 0.06);
+  --color-input-border: rgba(255, 255, 255, 0.15);
   --color-text: #b0b0b0;
   --color-text-muted: rgba(255, 255, 255, 0.35);
   --color-text-muted-light: rgba(255, 255, 255, 0.5);
@@ -345,7 +357,7 @@ body {
   min-height: calc(100vh - 52px);
   margin-top: 52px;
   padding: 100px 40px 60px;
-  background: var(--color-primary-dark);
+  background: var(--color-page);
   box-shadow:
     inset 0 0 60px rgba(0, 0, 0, 0.35),
     0 8px 32px rgba(0, 0, 0, 0.3);
@@ -363,7 +375,7 @@ body {
   line-height: 1.1;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--color-text);
   text-shadow:
     0 2px 8px rgba(0, 0, 0, 0.5),
     0 4px 20px rgba(0, 0, 0, 0.3);
@@ -373,36 +385,33 @@ body {
   font-size: 26px;
   font-weight: 400;
   margin: 0 0 20px;
-  color: #fff;
+  color: var(--color-text);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
-}
-
-.hero-tagline {
-  font-size: 26px;
-  font-weight: 400;
-  margin: 0 0 20px;
-  color: #fff;
 }
 
 .hero-description {
   font-size: 17px;
   line-height: 1.5;
   margin: 0 0 28px;
-  color: #fff;
+  color: var(--color-text);
+}
+
+.hero-description strong {
+  color: inherit;
 }
 
 .hero-rules h3 {
   font-size: 21px;
   font-weight: 700;
   margin: 0 0 6px;
-  color: #fff;
+  color: var(--color-text);
 }
 
 .hero-rules p {
   font-size: 15px;
   line-height: 1.5;
   margin: 0;
-  color: #fff;
+  color: var(--color-text);
 }
 
 .hero-visual {
@@ -484,7 +493,7 @@ body {
 .auth-card {
   width: 100%;
   max-width: 420px;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--color-card);
   border-radius: 16px;
   padding: 48px 40px;
 }
@@ -510,8 +519,8 @@ body {
   font-family: "Eczar", serif;
   font-size: 18px;
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: var(--color-input-bg);
+  border: 2px solid var(--color-input-border);
   border-radius: 8px;
   outline: none;
   transition: border-color 0.2s;
@@ -519,7 +528,7 @@ body {
 
 .auth-card input:focus { border-color: var(--color-text); }
 
-.auth-card input::placeholder { color: rgba(255, 255, 255, 0.5); }
+.auth-card input::placeholder { color: var(--color-text-muted); }
 
 .auth-btn {
   width: 100%;
@@ -555,7 +564,7 @@ body {
   text-align: center;
   margin-top: 24px;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text-muted);
 }
 
 .auth-link a {
@@ -881,7 +890,7 @@ body {
   height: 48px;
   background: var(--color-primary-darker);
   font-size: 14px;
-  color: #fff;
+  color: var(--color-text);
   flex-shrink: 0;
 }
 
@@ -974,7 +983,7 @@ body {
 .settings-card {
   max-width: 1100px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--color-card);
   border-radius: 16px;
 }
 
@@ -1000,35 +1009,35 @@ body {
 
 .settings-block {
   width: 100%;
-  padding: 14px 16px;
+  padding: 14px 20px;
   font-family: "Eczar", serif;
   font-size: 17px;
   font-weight: 700;
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.06);
-  border: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   cursor: pointer;
   text-align: left;
-  transition: background 0.2s;
+  transition: background 0.25s, border-color 0.25s, transform 0.2s;
 }
 
 .settings-block:hover {
-  background: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateX(3px);
 }
 
 .settings-block.active {
-  background: var(--color-primary);
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-primary-dark));
+  border-color: transparent;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 .settings-block:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
-}
-
-.settings-block--conta,
-.settings-block--aparencia {
-  border: 2px solid #000;
 }
 
 .settings-content {
@@ -1051,8 +1060,8 @@ body {
   font-family: "Eczar", serif;
   font-size: 15px;
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: var(--color-input-bg);
+  border: 2px solid var(--color-input-border);
   border-radius: 8px;
   outline: none;
   transition: border-color 0.2s;
@@ -1060,7 +1069,7 @@ body {
 
 .settings-content input:focus { border-color: var(--color-text); }
 
-.settings-content input::placeholder { color: rgba(255, 255, 255, 0.5); }
+.settings-content input::placeholder { color: var(--color-text-muted); }
 
 .settings-content .auth-btn {
   padding: 10px;
@@ -1331,13 +1340,13 @@ body {
   min-height: calc(100vh - 52px);
   margin-top: 52px;
   padding: 40px 40px 60px;
-  background: var(--color-primary-dark);
+  background: var(--color-page);
 }
 
 .guide-card {
   max-width: 960px;
   margin: 0 auto;
-  background: linear-gradient(160deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.18));
+  background: var(--color-card);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -1353,7 +1362,7 @@ body {
   font-size: 28px;
   font-weight: 800;
   margin: 0 0 2px;
-  color: #fff;
+  color: var(--color-text);
   text-shadow:
     0 2px 8px rgba(0, 0, 0, 0.5),
     0 4px 20px rgba(0, 0, 0, 0.3);
@@ -1362,7 +1371,7 @@ body {
 .guide-card-header p {
   font-size: 15px;
   margin: 0;
-  color: #fff;
+  color: var(--color-text);
 }
 
 .guide-card-body {
@@ -1428,7 +1437,7 @@ body {
 .guide-body {
   font-size: 16px;
   line-height: 1.7;
-  color: #fff;
+  color: var(--color-text);
 }
 
 .guide-body .mt-2 {
@@ -1453,7 +1462,7 @@ body {
   border-left: 4px solid var(--color-accent);
   border-radius: 0 10px 10px 0;
   font-size: 15px;
-  color: #fff;
+  color: var(--color-text);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
@@ -1528,7 +1537,7 @@ body {
 .ranking-card {
   max-width: 720px;
   margin: 0 auto;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--color-card);
   border-radius: 16px;
   overflow: hidden;
 }
