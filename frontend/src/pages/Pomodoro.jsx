@@ -36,6 +36,7 @@ export default function Pomodoro() {
   const [showTreePanel, setShowTreePanel] = useState(false)
   const [animacao, setAnimacao] = useState(null)
   const [treeData, setTreeData] = useState(null)
+  const [modoAnterior, setModoAnterior] = useState('focus')
 
   const totalRef = useRef(TEST_SECONDS)
   const hasAttemptedRecovery = useRef(false)
@@ -70,17 +71,14 @@ export default function Pomodoro() {
     } catch { }
   }, [])
 
-  const ganharTomates = (qtd) => {
-    setAnimacao(qtd)
-    setTimeout(() => setTomateCount((m) => m + qtd), 600)
-    setTimeout(() => setAnimacao(null), 3200)
-  }
-
-  const fetchTreeData = useCallback(async () => {
+  const fetchTreeData = useCallback(async (sincronizarTomate = false) => {
     if (!isAuthed) return
     const data = await apiFetch('/pomodoro/progresso')
     if (data && !data.erro) {
       setProgresso(data)
+      if (sincronizarTomate) {
+        setTomateCount(data.tomates ?? 0)
+      }
       setTreeData({
         estagio: data.arvoreEstagio,
         morta: data.arvoreMorta,
@@ -90,6 +88,7 @@ export default function Pomodoro() {
   }, [isAuthed])
 
   const startFocusSession = useCallback(async () => {
+    setMessage('')
     const data = await apiFetch('/pomodoro/start', {
       method: 'POST',
       body: JSON.stringify({ tipo: 'FOCUS' }),
@@ -118,16 +117,16 @@ export default function Pomodoro() {
     setStatus('running')
   }, [])
 
+  // Retorna quantos tomates ganhou, sem mexer no estado
   const finishFocusSession = useCallback(async () => {
     tocarSom()
     const data = await apiFetch('/pomodoro/finish', { method: 'POST' })
     if (data.erro) {
       setMessage('Erro ao finalizar: ' + data.erro)
       setStatus('idle')
-      return
+      return 0
     }
 
-    ganharTomates(5)
     const n = cycleRef.current + 1
     setCycleCount(n)
     const prox = proximoModo(n)
@@ -146,7 +145,9 @@ export default function Pomodoro() {
       msg += '. Hora de uma pausa curta'
     }
     setMessage(msg)
-    fetchTreeData()
+    fetchTreeData(false)
+
+    return data.tomatesGanhos ?? 0
   }, [tocarSom, fetchTreeData])
 
   const handleFocusCompleteLocal = useCallback(() => {
@@ -194,6 +195,16 @@ export default function Pomodoro() {
     timerFinishedRef.current = false
   }, [isAuthed, status, sessionId])
 
+  const handleFinalizarEIniciar = useCallback(async () => {
+    // Dispara animação ANTES de qualquer mudança de estado
+    setAnimacao(10)
+    setTimeout(() => setTomateCount((m) => m + 10), 1000)
+    setTimeout(() => setAnimacao(null), 4500)
+
+    await finishFocusSession()
+    setTimeout(() => startLocalTimer(), 1200)
+  }, [finishFocusSession, startLocalTimer])
+
   useEffect(() => {
     if (isAuthed && !hasAttemptedRecovery.current) {
       hasAttemptedRecovery.current = true
@@ -210,6 +221,7 @@ export default function Pomodoro() {
           apiFetch('/pomodoro/progresso').then((p) => {
             if (p && !p.erro) {
               setProgresso(p)
+              setTomateCount(p.tomates ?? 0)
               setTreeData({
                 estagio: p.arvoreEstagio,
                 morta: p.arvoreMorta,
@@ -226,41 +238,35 @@ export default function Pomodoro() {
   }, [isAuthed])
 
   useEffect(() => {
-    fetchTreeData()
+    fetchTreeData(true)
   }, [fetchTreeData])
 
-  // ✅ CORREÇÃO 1 — interval para em 1, não em 0
- useEffect(() => {
-   if (status !== 'running') return
-
-   timerFinishedRef.current = false
-
-   const id = setInterval(() => {
-     setRemaining((prev) => {
-       if (prev <= 1) {
-         clearInterval(id)
-         return 0
-       }
-
-       return prev - 1
-     })
-   }, 1000)
-
-   intervalRef.current = id
-
-   return () => clearInterval(id)
- }, [status])
-
-  // ✅ CORREÇÃO 2 — detecta fim quando remaining === 1
   useEffect(() => {
-      if (status !== 'running' || remaining > 0 || timerFinishedRef.current) return
+    if (status !== 'running') return
+    timerFinishedRef.current = false
+    const id = setInterval(() => {
+      setRemaining((prev) => {
+        if (prev <= 1) { clearInterval(id); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+    intervalRef.current = id
+    return () => clearInterval(id)
+  }, [status])
+
+  useEffect(() => {
+    if (status !== 'running' || remaining > 0 || timerFinishedRef.current) return
     timerFinishedRef.current = true
-    if (mode === 'focus') {
-      if (isAuthed) {
-        tocarSom()
-        setStatus('completed')
-        setMessage('Foco concluído! Clique em Finalizar para receber suas recompensas.')
-      } else {
+   if (mode === 'focus') {
+         if (isAuthed) {
+           tocarSom()
+           setModoAnterior(mode)
+           setAnimacao(10)
+           setTimeout(() => setTomateCount((m) => m + 10), 1500)
+           setTimeout(() => setAnimacao(null), 5000)
+           setStatus('completed')
+           setMessage('')
+         } else {
         handleFocusCompleteLocal()
       }
     } else {
@@ -290,11 +296,12 @@ export default function Pomodoro() {
   return (
     <div className="pomodoro-page" style={{ position: 'relative' }}>
       <style>{`
-        @keyframes subirSumir {
-          0%   { opacity: 0; transform: translateY(20px) scale(0.7); }
-          20%  { opacity: 1; transform: translateY(0px) scale(1); }
-          70%  { opacity: 1; transform: translateY(-20px) scale(1.05); }
-          100% { opacity: 0; transform: translateY(-140px) scale(1.2); }
+       @keyframes subirSumir {
+                 0%   { opacity: 0; transform: translateY(10px) scale(0.8); }
+                 15%  { opacity: 1; transform: translateY(0px) scale(1.3); }
+                 60%  { opacity: 1; transform: translateY(-60px) scale(1.1); }
+                 100% { opacity: 0; transform: translateY(-160px) scale(1.0); }
+               }
         }
         @keyframes subirMensagem {
           0%   { opacity: 0; transform: translateX(-50%) translateY(-40px); }
@@ -416,10 +423,11 @@ export default function Pomodoro() {
               fontSize: '1.3rem',
               zIndex: '9999',
               textShadow: '0 0 5px rgba(255,215,0,0.8), 0 0 10px rgba(255,215,0,0.6), 2px 2px 0 #000',
-              animation: 'subirSumir 3s ease-out forwards',
+              animation: 'subirSumir 5s ease-out forwards',
+
               pointerEvents: 'none'
             }}>
-              +{animacao} 🍅
+              +{animação} 🍅
             </span>
           )}
         </div>
@@ -461,13 +469,11 @@ export default function Pomodoro() {
                 strokeLinecap="round"
                 strokeDasharray={CIRCUNFERENCIA}
                 strokeDashoffset={offset}
-              style={{
-                transition: status === 'running'
-                  ? 'stroke-dashoffset 1s linear'
-                  : 'none'
-                  ? 'stroke-dashoffset 0.3s linear'
-                  : 'none'
-              }}
+                style={{
+                  transition: status === 'running'
+                    ? 'stroke-dashoffset 1s linear'
+                    : 'none'
+                }}
               />
             </svg>
             <div style={{
@@ -522,18 +528,9 @@ export default function Pomodoro() {
 
             {status === 'completed' && isAuthed && (
               <button
-                onClick={finishFocusSession}
-                style={{
-                  padding: '10px 28px',
-                  fontSize: '1rem',
-                  fontWeight: 'bold',
-                  backgroundColor: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer'
-                }}>
-                Finalizar e Receber Recompensas
+                onClick={handleFinalizarEIniciar}
+                className="pomodoro-btn pomodoro-btn-green">
+                {modoAnterior === 'focus' ? 'Iniciar Pausa Curta' : 'Iniciar Foco'}
               </button>
             )}
 

@@ -21,9 +21,8 @@ public class PomodoroSessionService {
 
   private static final int FOCUS_DURATION_SEGUNDOS = 25 * 60;
   private static final int GRACE_SEGUNDOS = 120;
-  private static final int PONTOS_POR_MINUTO = 1;
   private static final int BONUS_CONCLUSAO = 10;
-  private static final int TOMATE_INTERVALO_SEGUNDOS = 5 * 60;
+  private static final int TOMATES_POR_CICLO = 10;
 
   private final PomodoroSessionRepository sessionRepository;
   private final TreeStateRepository treeStateRepository;
@@ -102,9 +101,8 @@ public class PomodoroSessionService {
         elapsed = FOCUS_DURATION_SEGUNDOS;
       }
 
-      int minutos = (int) (elapsed / 60);
-      int pontos = minutos * PONTOS_POR_MINUTO + BONUS_CONCLUSAO;
-      int tomates = (int) (elapsed / TOMATE_INTERVALO_SEGUNDOS);
+      int pontos = BONUS_CONCLUSAO;
+      int tomates = TOMATES_POR_CICLO;
 
       session.setPontosGanhos(pontos);
       session.setTomatesGanhos(tomates);
