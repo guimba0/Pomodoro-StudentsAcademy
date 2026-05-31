@@ -36,6 +36,7 @@ export default function Pomodoro() {
   const [showTreePanel, setShowTreePanel] = useState(false)
   const [animacao, setAnimacao] = useState(null)
   const [treeData, setTreeData] = useState(null)
+  const [regando, setRegando] = useState(false)
   const [modoAnterior, setModoAnterior] = useState('focus')
 
   const totalRef = useRef(TEST_SECONDS)
@@ -201,6 +202,10 @@ export default function Pomodoro() {
 
   const handleFinalizarEIniciar = useCallback(async () => {
     setAnimacao(10)
+    setRegando(true)
+    setTimeout(() => setRegando(false), 2500)
+    setRegando(true)
+    setTimeout(() => setRegando(false), 2500)
     setTimeout(() => setTomateCount((m) => m + 10), 1000)
     setTimeout(() => setAnimacao(null), 4500)
 
@@ -279,6 +284,8 @@ export default function Pomodoro() {
            tocarSom()
            setModoAnterior(mode)
            setAnimacao(10)
+           setRegando(true)
+           setTimeout(() => setRegando(false), 2500)
            setTimeout(() => setTomateCount((m) => m + 10), 1500)
            setTimeout(() => setAnimacao(null), 5000)
            setStatus('completed')
@@ -376,47 +383,94 @@ export default function Pomodoro() {
         }
         .botao-arvore:hover .botao-arvore-icone { color: rgba(255,255,255,1); }
         .arvore-painel {
-          width: 0;
-          overflow: hidden;
-          transition: width 0.4s ease;
-          background: rgba(0,0,0,0.3);
-          border-radius: 0 24px 24px 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow:
-            0 0 0 1px rgba(0,0,0,0.2),
-            0 0 8px 2px rgba(0,0,0,0.25),
-            0 0 20px 6px rgba(0,0,0,0.15),
-            0 0 40px 10px rgba(0,0,0,0.08);
-        }
-        .arvore-painel.aberto { width: 260px; }
-        .arvore-conteudo {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 12px;
-          padding: 20px;
-          color: white;
-          text-align: center;
-        }
-        .arvore-icone-grande { font-size: 4rem; line-height: 1; }
-        .arvore-label { font-size: 1.1rem; font-weight: 700; }
-        .arvore-stats {
-          font-size: 0.85rem;
-          color: rgba(255,255,255,0.65);
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-        .arvore-stats span {
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-        }
-        .arvore-stats .valor { color: white; font-weight: 600; }
-        .arvore-morta { color: #ff6b6b; }
-        .arvore-viva { color: #4caf50; }
+                  width: 0;
+                  overflow: hidden;
+                  transition: width 0.4s ease;
+                  background: rgba(0,0,0,0.3);
+                  border-radius: 0 24px 24px 0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  box-shadow:
+                    0 0 0 1px rgba(0,0,0,0.2),
+                    0 0 8px 2px rgba(0,0,0,0.25),
+                    0 0 20px 6px rgba(0,0,0,0.15),
+                    0 0 40px 10px rgba(0,0,0,0.08);
+                }
+                .arvore-painel.aberto { width: 420px; }
+                .arvore-conteudo {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 10px;
+                  padding: 16px;
+                  color: white;
+                  text-align: center;
+                  width: 420px;
+                }
+                .arvore-imagem-wrapper {
+                  position: relative;
+                  width: 360px;
+                  height: 260px;
+                  border-radius: 16px;
+                  overflow: hidden;
+                }
+                .arvore-imagem {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                  border-radius: 16px;
+                  transition: opacity 0.8s ease;
+                }
+                .arvore-imagem.trocando { opacity: 0; }
+                @keyframes regarMover {
+                  0%   { transform: translate(0px, 0px) rotate(0deg); }
+                  30%  { transform: translate(-30px, -10px) rotate(-25deg); }
+                  55%  { transform: translate(-40px, 5px) rotate(-35deg); }
+                  80%  { transform: translate(-30px, -10px) rotate(-25deg); }
+                  100% { transform: translate(0px, 0px) rotate(0deg); }
+                }
+                @keyframes gotasCair {
+                  0%   { opacity: 0; transform: translateY(0px); }
+                  30%  { opacity: 1; }
+                  100% { opacity: 0; transform: translateY(20px); }
+                }
+                .regador-wrapper {
+                  position: absolute;
+                  bottom: 18px;
+                  right: 18px;
+                  width: 54px;
+                  height: 54px;
+                  animation: regarMover 2.5s ease-in-out forwards;
+                }
+                .regador-wrapper.parado { animation: none; }
+                .gota {
+                  position: absolute;
+                  width: 4px;
+                  height: 8px;
+                  background: #5bb8ff;
+                  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+                  animation: gotasCair 0.6s ease-in infinite;
+                }
+                .gota:nth-child(1) { left: 2px;  top: -10px; animation-delay: 0s; }
+                .gota:nth-child(2) { left: 10px; top: -14px; animation-delay: 0.15s; }
+                .gota:nth-child(3) { left: 18px; top: -10px; animation-delay: 0.3s; }
+                .arvore-label { font-size: 1rem; font-weight: 700; }
+                .arvore-stats {
+                  font-size: 0.82rem;
+                  color: rgba(255,255,255,0.65);
+                  display: flex;
+                  flex-direction: column;
+                  gap: 4px;
+                }
+                .arvore-stats span {
+                  display: flex;
+                  justify-content: space-between;
+                  gap: 12px;
+                }
+                .arvore-stats .valor { color: white; font-weight: 600; }
+                .arvore-morta { color: #ff6b6b; }
+                .arvore-viva { color: #4caf50; }
       `}</style>
 
       {isAuthed && (
@@ -581,21 +635,51 @@ export default function Pomodoro() {
         <div className={`arvore-painel ${showTreePanel ? 'aberto' : ''}`}>
           {isAuthed ? (
             <div className="arvore-conteudo">
-              <div className="arvore-icone-grande">{treeEmoji()}</div>
-              <div className={`arvore-label ${treeData?.morta ? 'arvore-morta' : 'arvore-viva'}`}>
-                {treeLabel()}
-              </div>
-              {treeData?.morta && (
-                <div style={{ color: '#ff6b6b', fontSize: '0.85rem', fontWeight: 600 }}>
-                  Sua árvore morreu por abandono. Inicie um novo foco para plantar uma nova.
-                </div>
-              )}
-              <div className="arvore-stats">
-                <span>Focos completos: <span className="valor">{treeData?.focosCompletos ?? 0}</span></span>
-                <span>Pontos: <span className="valor">{progresso?.pontos ?? 0}</span></span>
-                <span>🍅 Tomates: <span className="valor">{progresso?.tomates ?? 0}</span></span>
-              </div>
-            </div>
+                          <div className="arvore-imagem-wrapper">
+                            <img
+                              className="arvore-imagem"
+                           src={
+                             treeData?.morta
+                               ? '/img/estagio1.jpg'
+                               : treeData?.estagio === 'TREE'
+                                 ? '/img/estagio3.jpg'
+                                 : treeData?.estagio === 'SEEDLING'
+                                   ? '/img/estagio2.jpg'
+                                   : '/img/estagio1.jpg'
+                           }
+                              alt="Planta"
+                            />
+                            <div className={`regador-wrapper ${regando ? '' : 'parado'}`}>
+                              <svg width="54" height="54" viewBox="0 0 54 54" fill="none">
+                                <ellipse cx="22" cy="32" rx="14" ry="10" fill="#b0b8c1" stroke="#7a8a99" strokeWidth="2"/>
+                                <rect x="34" y="28" width="14" height="6" rx="3" fill="#b0b8c1" stroke="#7a8a99" strokeWidth="2"/>
+                                <path d="M22 22 Q22 14 30 12" stroke="#7a8a99" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+                                <circle cx="22" cy="42" r="3" fill="#7a8a99"/>
+                                <circle cx="30" cy="42" r="3" fill="#7a8a99"/>
+                              </svg>
+                              {regando && (
+                                <>
+                                  <div className="gota" />
+                                  <div className="gota" />
+                                  <div className="gota" />
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className={`arvore-label ${treeData?.morta ? 'arvore-morta' : 'arvore-viva'}`}>
+                            {treeLabel()}
+                          </div>
+                          {treeData?.morta && (
+                            <div style={{ color: '#ff6b6b', fontSize: '0.82rem', fontWeight: 600 }}>
+                              Sua árvore morreu. Inicie um novo foco para plantar uma nova.
+                            </div>
+                          )}
+                          <div className="arvore-stats">
+                            <span>Focos completos: <span className="valor">{treeData?.focosCompletos ?? 0}</span></span>
+                            <span>Pontos: <span className="valor">{progresso?.pontos ?? 0}</span></span>
+                            <span>🍅 Tomates: <span className="valor">{progresso?.tomates ?? 0}</span></span>
+                          </div>
+                        </div>
           ) : (
             <p style={{
               color: 'rgba(255,255,255,0.3)',
