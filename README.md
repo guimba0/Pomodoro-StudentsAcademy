@@ -74,7 +74,7 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
 ## Tecnologias
 
 **Backend**
-- Java + **Javalin**
+- Java + **SpringBoot**
 - SQLite
 
 **Frontend**
