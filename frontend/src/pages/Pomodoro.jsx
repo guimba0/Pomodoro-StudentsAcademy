@@ -410,8 +410,8 @@ export default function Pomodoro() {
                 }
                 .arvore-imagem-wrapper {
                   position: relative;
-                  width: 360px;
-                  height: 260px;
+                  width: 400px;
+                  height: 300px;
                   border-radius: 16px;
                   overflow: hidden;
                 }
@@ -437,8 +437,8 @@ export default function Pomodoro() {
                 }
                 .regador-wrapper {
                   position: absolute;
-                  bottom: 18px;
-                  right: 18px;
+                  bottom: 135px;
+                  right: 50px;
                   width: 54px;
                   height: 54px;
                   animation: regarMover 2.5s ease-in-out forwards;
@@ -650,21 +650,15 @@ export default function Pomodoro() {
                               alt="Planta"
                             />
                             <div className={`regador-wrapper ${regando ? '' : 'parado'}`}>
-                              <svg width="54" height="54" viewBox="0 0 54 54" fill="none">
-                                <ellipse cx="22" cy="32" rx="14" ry="10" fill="#b0b8c1" stroke="#7a8a99" strokeWidth="2"/>
-                                <rect x="34" y="28" width="14" height="6" rx="3" fill="#b0b8c1" stroke="#7a8a99" strokeWidth="2"/>
-                                <path d="M22 22 Q22 14 30 12" stroke="#7a8a99" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-                                <circle cx="22" cy="42" r="3" fill="#7a8a99"/>
-                                <circle cx="30" cy="42" r="3" fill="#7a8a99"/>
-                              </svg>
-                              {regando && (
-                                <>
-                                  <div className="gota" />
-                                  <div className="gota" />
-                                  <div className="gota" />
-                                </>
-                              )}
-                            </div>
+                                              <img src="/img/regador.png" alt="regador" style={{ width: '100px', height: '100px' }} />
+                                              {regando && (
+                                                <>
+                                                  <div className="gota" />
+                                                  <div className="gota" />
+                                                  <div className="gota" />
+                                                </>
+                                              )}
+                                            </div>
                           </div>
                           <div className={`arvore-label ${treeData?.morta ? 'arvore-morta' : 'arvore-viva'}`}>
                             {treeLabel()}
