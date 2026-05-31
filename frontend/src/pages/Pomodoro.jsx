@@ -39,10 +39,12 @@ export default function Pomodoro() {
   const [modoAnterior, setModoAnterior] = useState('focus')
 
   const totalRef = useRef(TEST_SECONDS)
+  const startedAtRef = useRef(null)
   const hasAttemptedRecovery = useRef(false)
   const intervalRef = useRef(null)
   const timerFinishedRef = useRef(false)
   const cycleRef = useRef(0)
+  const [elapsedMs, setElapsedMs] = useState(0)
 
   useEffect(() => { cycleRef.current = cycleCount }, [cycleCount])
 
@@ -103,6 +105,7 @@ export default function Pomodoro() {
     setRemaining(duracao)
     totalRef.current = duracao
     setStatus('running')
+    startedAtRef.current = Date.now()
     if (data.recuperada) {
       setRecovered(true)
       setMessage('Sessão recuperada!')
@@ -111,11 +114,12 @@ export default function Pomodoro() {
 
   const startLocalTimer = useCallback(() => {
     timerFinishedRef.current = false
-    const duracao = getDuration('focus')
+    const duracao = getDuration(mode)
     setRemaining(duracao)
     totalRef.current = duracao
     setStatus('running')
-  }, [])
+    startedAtRef.current = Date.now()
+  }, [mode])
 
   // Retorna quantos tomates ganhou, sem mexer no estado
   const finishFocusSession = useCallback(async () => {
@@ -196,13 +200,12 @@ export default function Pomodoro() {
   }, [isAuthed, status, sessionId])
 
   const handleFinalizarEIniciar = useCallback(async () => {
-    // Dispara animação ANTES de qualquer mudança de estado
     setAnimacao(10)
     setTimeout(() => setTomateCount((m) => m + 10), 1000)
     setTimeout(() => setAnimacao(null), 4500)
 
     await finishFocusSession()
-    setTimeout(() => startLocalTimer(), 1200)
+    startLocalTimer()
   }, [finishFocusSession, startLocalTimer])
 
   useEffect(() => {
@@ -217,6 +220,7 @@ export default function Pomodoro() {
           setRecovered(true)
           setStatus('running')
           setMessage('Sessão recuperada!')
+          startedAtRef.current = Date.now()
         } else {
           apiFetch('/pomodoro/progresso').then((p) => {
             if (p && !p.erro) {
@@ -255,6 +259,19 @@ export default function Pomodoro() {
   }, [status])
 
   useEffect(() => {
+    if (status !== 'running') {
+      setElapsedMs(0)
+      return
+    }
+    const id = setInterval(() => {
+      if (startedAtRef.current) {
+        setElapsedMs(Date.now() - startedAtRef.current)
+      }
+    }, 50)
+    return () => clearInterval(id)
+  }, [status])
+
+  useEffect(() => {
     if (status !== 'running' || remaining > 0 || timerFinishedRef.current) return
     timerFinishedRef.current = true
    if (mode === 'focus') {
@@ -274,8 +291,10 @@ export default function Pomodoro() {
     }
   }, [remaining, status, mode, isAuthed, tocarSom, handleFocusCompleteLocal, handleBreakComplete])
 
-  const progressoAtual = status === 'idle' ? 1 : (totalRef.current > 0 ? remaining / totalRef.current : 1)
-  const offset = CIRCUNFERENCIA * (1 - progressoAtual)
+  const smoothProgress = (status === 'running' || status === 'paused') && startedAtRef.current
+    ? Math.max(1 - (elapsedMs / 1000) / totalRef.current, 0)
+    : (totalRef.current > 0 ? remaining / totalRef.current : 1)
+  const offset = CIRCUNFERENCIA * (1 - smoothProgress)
 
   const treeEmoji = () => {
     if (!treeData) return '🌱'
@@ -470,11 +489,7 @@ export default function Pomodoro() {
                 strokeLinecap="round"
                 strokeDasharray={CIRCUNFERENCIA}
                 strokeDashoffset={offset}
-                style={{
-                  transition: status === 'running'
-                    ? 'stroke-dashoffset 1s linear'
-                    : 'none'
-                }}
+                style={{ transition: 'none' }}
               />
             </svg>
             <div style={{
