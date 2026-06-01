@@ -64,7 +64,7 @@ function Navbar() {
             aria-label="Menu do utilizador"
             onClick={() => setOpen(o => !o)}
           >
-            <img className="nav-profile" src="/img/ProfilePhoto.png" alt="" />
+            <img className="nav-profile" src={user?.avatar || '/img/ProfilePhoto.png'} alt="" />
           </button>
           <ul className={`nav-dropdown${open ? ' open' : ''}`}>
             <li><Link to="/perfil" onClick={() => setOpen(false)}>Perfil</Link></li>

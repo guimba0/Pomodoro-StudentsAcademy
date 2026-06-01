@@ -347,6 +347,8 @@ export default function Pomodoro() {
       <div className="card-wrapper">
         <div className="timer-card">
 
+          <div className="timer-section">
+
           <div className="pomodoro-svg-wrapper" style={{ width: `${W}px` }}>
             <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
               <path
@@ -386,6 +388,9 @@ export default function Pomodoro() {
             {cycleCount % TOTAL_CYCLES}/{TOTAL_CYCLES} ciclos completos
           </p>
 
+          </div>
+
+          <div className="timer-actions">
           <div className="pomodoro-btn-group">
 
             {status === 'idle' && (
@@ -407,46 +412,47 @@ export default function Pomodoro() {
             {(status === 'running' || status === 'paused') && (
               <div className="pomodoro-btn-row">
                 <button
-                  onClick={resetTimer}
-                  className="pomodoro-btn pomodoro-btn-red">
-                  Reiniciar
-                </button>
-                <button
                   onClick={() => setStatus((s) => s === 'running' ? 'paused' : 'running')}
                   className={`pomodoro-btn ${status === 'running' ? 'pomodoro-btn-yellow' : 'pomodoro-btn-green'}`}>
                   {status === 'running' ? 'Pausar' : 'Retomar'}
+                </button>
+                <button
+                  onClick={resetTimer}
+                  className="pomodoro-btn pomodoro-btn-red">
+                  Reiniciar
                 </button>
               </div>
             )}
 
           </div>
+          </div>
         </div>
 
         <button
-          className="botao-arvore"
+          className={`botao-arvore${showTreePanel ? ' aberto' : ''}`}
           onClick={() => setShowTreePanel((a) => !a)}
           title={showTreePanel ? 'Fechar árvore' : 'Ver árvore'}
         >
           <span className="botao-arvore-icone">
-            {showTreePanel ? '◀  ||' : '||  ▶'}
+            ▶
           </span>
         </button>
 
         <div className={`arvore-painel ${showTreePanel ? 'aberto' : ''}`}>
           {isAuthed ? (
             <div className="arvore-conteudo">
-                          <div className="arvore-imagem-wrapper">
+                          <div className="arvore-imagem-container">
                             <img
                               className="arvore-imagem"
-                           src={
-                             treeData?.morta
-                               ? '/img/estagio1.jpg'
-                               : treeData?.estagio === 'TREE'
-                                 ? '/img/estagio3.jpg'
-                                 : treeData?.estagio === 'SEEDLING'
-                                   ? '/img/estagio2.jpg'
-                                   : '/img/estagio1.jpg'
-                           }
+                              src={
+                              treeData?.morta
+                                ? '/img/estagio1.jpg'
+                                : treeData?.estagio === 'TREE'
+                                  ? '/img/estagio3.jpg'
+                                  : treeData?.estagio === 'SEEDLING'
+                                    ? '/img/estagio2.jpg'
+                                    : '/img/estagio1.jpg'
+                              }
                               alt="Planta"
                             />
                             <div className={`regador-wrapper ${regando ? '' : 'parado'}`}>

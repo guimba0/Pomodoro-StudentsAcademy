@@ -37,9 +37,18 @@ export default function Register() {
       if (data.erro) {
         setErro(data.erro)
       } else if (data.token) {
+        const userData = {
+          id: data.id,
+          nome: data.nome,
+          email: data.email,
+          avatar: data.avatar ?? null,
+          wallpaper: data.wallpaper ?? null,
+          pontos: data.pontos ?? 0,
+          tomates: data.tomates ?? 0,
+        }
         localStorage.setItem('pomodoro_token', data.token)
-        localStorage.setItem('pomodoro_user', JSON.stringify({ nome: data.nome, email: data.email }))
-        setUser({ nome: data.nome, email: data.email })
+        localStorage.setItem('pomodoro_user', JSON.stringify(userData))
+        setUser(userData)
         navigate('/')
       }
     } catch {

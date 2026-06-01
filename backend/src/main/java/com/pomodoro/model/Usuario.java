@@ -32,6 +32,9 @@ public class Usuario {
   @Column(nullable = true)
   private String avatar;         // 9. Avatar personalizado (path ou base64)
 
+  @Column(columnDefinition = "TEXT")
+  private String itens = "[]";   // 10. Lista JSON de IDs de itens comprados na loja
+
   public Usuario() {}
 
   public Usuario(String nome, String email, String senha) {
@@ -59,4 +62,6 @@ public class Usuario {
   public void setWallpaper(String wallpaper) { this.wallpaper = wallpaper; }
   public String getAvatar() { return avatar; }
   public void setAvatar(String avatar) { this.avatar = avatar; }
+  public String getItens() { return itens; }
+  public void setItens(String itens) { this.itens = itens; }
 }

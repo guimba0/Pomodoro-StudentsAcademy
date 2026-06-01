@@ -20,7 +20,7 @@ public class WebConfig {
                           "http://localhost:5174",
                           "http://localhost:5175")
           .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 5. Métodos HTTP permitidos
-          .allowedHeaders("*")                                  // 6. Qualquer header é aceito
+          .allowedHeaders("Authorization", "Content-Type", "X-Requested-With") // 6. Headers explícitos com credentials
           .allowCredentials(true);                              // 7. Permite enviar cookies/sessão
       }
     };

@@ -29,6 +29,7 @@ class UsuarioServiceTest {
   @Mock private UsuarioRepository usuarioRepository;
   @Mock private PomodoroSessionRepository sessionRepository;
   @Mock private BCryptPasswordEncoder passwordEncoder;
+  @Mock private com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
   @InjectMocks private UsuarioService service;
 
@@ -197,7 +198,7 @@ class UsuarioServiceTest {
     when(sessionRepository.countByUsuarioIdAndStatus(anyLong(), eq(SessionStatus.FAILED)))
         .thenReturn(0L);
 
-    List<RankingResponse> ranking = service.obterTopRanking();
+    List<RankingResponse> ranking = service.obterTopRanking("all");
 
     assertEquals(2, ranking.size());
     assertEquals("Ana", ranking.get(0).getNome());

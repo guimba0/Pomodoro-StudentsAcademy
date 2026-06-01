@@ -8,6 +8,7 @@ import com.pomodoro.dto.CadastroRequest;
 import com.pomodoro.dto.LoginRequest;
 import com.pomodoro.dto.LoginResponse;
 import com.pomodoro.dto.RankingResponse;
+import com.pomodoro.dto.RedefinirSenhaRequest;
 import com.pomodoro.dto.UsuarioResponse;
 import com.pomodoro.model.Usuario;
 import com.pomodoro.service.UsuarioService;
@@ -37,7 +38,7 @@ public class AuthController {
     try {
       Usuario u = usuarioService.cadastrar(req.getNome(), req.getEmail(), req.getSenha());
       String token = jwtUtil.gerarToken(u.getId());
-      return ResponseEntity.ok(new LoginResponse(true, token, u.getNome(), u.getEmail()));
+      return ResponseEntity.status(201).body(new LoginResponse(true, token, u.getId(), u.getNome(), u.getEmail(), u.getAvatar(), u.getWallpaper(), u.getPontos(), u.getTomates()));
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().body(new LoginResponse(e.getMessage()));
     }
@@ -50,7 +51,7 @@ public class AuthController {
     if (usuarioOpt.isPresent()) {
       Usuario u = usuarioOpt.get();
       String token = jwtUtil.gerarToken(u.getId());
-      return ResponseEntity.ok(new LoginResponse(true, token, u.getNome(), u.getEmail()));
+      return ResponseEntity.ok(new LoginResponse(true, token, u.getId(), u.getNome(), u.getEmail(), u.getAvatar(), u.getWallpaper(), u.getPontos(), u.getTomates()));
     }
     return ResponseEntity.status(401).body(new LoginResponse("E-mail ou senha inválidos."));
   }
@@ -65,7 +66,7 @@ public class AuthController {
     var usuarioOpt = usuarioService.buscarPorId(usuarioId);
     if (usuarioOpt.isPresent()) {
       Usuario u = usuarioOpt.get();
-      return ResponseEntity.ok(new UsuarioResponse(true, u.getNome(), u.getEmail()));
+      return ResponseEntity.ok(new UsuarioResponse(true, u.getId(), u.getNome(), u.getEmail(), u.getAvatar(), u.getWallpaper(), u.getPontos(), u.getTomates()));
     }
     return ResponseEntity.status(404).body(new UsuarioResponse("Usuário não encontrado"));
   }
@@ -79,7 +80,7 @@ public class AuthController {
     }
     try {
       Usuario u = usuarioService.atualizar(usuarioId, req.getNome(), req.getEmail(), req.getSenha());
-      return ResponseEntity.ok(new UsuarioResponse(true, u.getNome(), u.getEmail()));
+      return ResponseEntity.ok(new UsuarioResponse(true, u.getId(), u.getNome(), u.getEmail(), u.getAvatar(), u.getWallpaper(), u.getPontos(), u.getTomates()));
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().body(new UsuarioResponse(e.getMessage()));
     }
@@ -93,15 +94,9 @@ public class AuthController {
 
   // 7. POST /api/esqueci-senha — redefine a senha pelo email
   @PostMapping("/esqueci-senha")
-  public ResponseEntity<?> redefinirSenha(@RequestBody Map<String, String> dados) {
+  public ResponseEntity<?> redefinirSenha(@Valid @RequestBody RedefinirSenhaRequest req) {
     try {
-      String email = dados.get("email");
-      String novaSenha = dados.get("novaSenha");
-      if (novaSenha == null) novaSenha = dados.get("senha");
-      if (email == null || novaSenha == null) {
-        return ResponseEntity.badRequest().body(new UsuarioResponse("E-mail ou senha não enviados corretamente."));
-      }
-      usuarioService.redefinirSenha(email, novaSenha);
+      usuarioService.redefinirSenha(req.getEmail(), req.getSenha());
       return ResponseEntity.ok(Map.of("mensagem", "Senha alterada com sucesso!"));
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(new UsuarioResponse("Não foi possível alterar: " + e.getMessage()));
@@ -154,8 +149,8 @@ public class AuthController {
 
   // 11. GET /api/ranking — top 10 usuários com mais ciclos completos
   @GetMapping("/ranking")
-  public ResponseEntity<?> ranking() {
-    List<RankingResponse> ranking = usuarioService.obterTopRanking();
+  public ResponseEntity<?> ranking(@RequestParam(defaultValue = "all") String periodo) {
+    List<RankingResponse> ranking = usuarioService.obterTopRanking(periodo);
     return ResponseEntity.ok(ranking);
   }
 }

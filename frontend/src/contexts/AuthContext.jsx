@@ -25,7 +25,15 @@ export function AuthProvider({ children }) {
 
     fetchMe().then((data) => {
       if (data.logado) {
-        const u = { nome: data.nome, email: data.email }
+        const u = {
+          id: data.id,
+          nome: data.nome,
+          email: data.email,
+          avatar: data.avatar ?? null,
+          wallpaper: data.wallpaper ?? null,
+          pontos: data.pontos ?? 0,
+          tomates: data.tomates ?? 0,
+        }
         setUser(u)
         localStorage.setItem(USER_KEY, JSON.stringify(u))
       } else if (!data.erro?.includes('conexão')) {

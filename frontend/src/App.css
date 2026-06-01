@@ -18,17 +18,17 @@
 }
 
 @keyframes regarMover {
-  0%   { transform: translate(0px, 0px) rotate(0deg); }
-  30%  { transform: translate(-30px, -10px) rotate(-25deg); }
-  55%  { transform: translate(-40px, 5px) rotate(-35deg); }
-  80%  { transform: translate(-30px, -10px) rotate(-25deg); }
-  100% { transform: translate(0px, 0px) rotate(0deg); }
+  0%   { transform: translateX(-50%) translateY(-20px) rotate(-5deg); opacity: 0; }
+  20%  { transform: translateX(-50%) translateY(0) rotate(-20deg); opacity: 1; }
+  50%  { transform: translateX(-50%) translateY(0) rotate(-25deg); }
+  80%  { transform: translateX(-50%) translateY(0) rotate(-20deg); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(-20px) rotate(-5deg); opacity: 0; }
 }
 
 @keyframes gotasCair {
   0%   { opacity: 0; transform: translateY(0px); }
-  30%  { opacity: 1; }
-  100% { opacity: 0; transform: translateY(20px); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(100px); }
 }
 
 @keyframes pulse {
@@ -1668,6 +1668,26 @@ body {
   background: var(--color-overlay);
 }
 
+.loja-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1000px;
+  margin: 0 auto 16px;
+  padding-left: 8px;
+}
+
+.loja-cart-icon {
+  flex-shrink: 0;
+  color: var(--color-text);
+}
+
+.loja-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
+}
+
 .loja-moldura-inferior {
   background: var(--color-primary-darker);
   border-radius: 16px;
@@ -1682,7 +1702,7 @@ body {
   background: var(--color-second-dark);
   border-radius: 14px;
   width: 100%;
-  min-height: 500px;
+  min-height: 320px;
   overflow: hidden;
 }
 
@@ -1729,6 +1749,16 @@ body {
   padding: 30px;
 }
 
+.loja-msg-inline {
+  text-align: center;
+  font-size: 15px;
+  color: var(--color-text);
+  background: var(--color-success);
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
+
 .loja-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -1750,10 +1780,30 @@ body {
   background: rgba(0, 0, 0, 0.35);
 }
 
+.item-card.item-own {
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
 .item-icone-wrapper {
   font-size: 3.5rem;
   margin-bottom: 12px;
   line-height: 1;
+}
+
+.item-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.item-wallpaper-thumb {
+  width: 100%;
+  height: 80px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background-size: cover;
+  background-position: center;
 }
 
 .item-nome {
@@ -1761,6 +1811,12 @@ body {
   font-weight: 700;
   color: var(--color-text);
   margin: 0 0 8px;
+}
+
+.item-tipo {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
 }
 
 .item-preco-linha {
@@ -1771,6 +1827,13 @@ body {
   font-weight: 700;
   color: var(--color-text-muted-light);
   margin-bottom: 16px;
+}
+
+.item-status {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #4caf50;
+  padding: 8px 0;
 }
 
 .loja-btn-comprar {
@@ -1791,6 +1854,11 @@ body {
   background: #22863a;
 }
 
+.loja-btn-comprar:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .item-card.em-breve {
   border: 2px dashed rgba(255, 255, 255, 0.2);
   background: rgba(0, 0, 0, 0.1);
@@ -1809,6 +1877,21 @@ body {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.35);
   font-weight: 600;
+}
+
+.loja-flaticon-credito {
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-align: center;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.loja-flaticon-credito a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
 }
 
 .regador-img {
@@ -1840,6 +1923,13 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 14px;
   }
+  .loja-header {
+    max-width: 100%;
+    padding: 0 4px;
+  }
+  .loja-title {
+    font-size: 22px;
+  }
 }
 
 /* ===== POMODORO (estrutura interna do timer) ===== */
@@ -1849,17 +1939,38 @@ body {
 
 .card-wrapper {
   display: flex;
+  flex-direction: row;
   align-items: stretch;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .timer-card {
-  background: var(--color-primary-dark);
-  border-radius: 24px 0 0 24px;
-  padding: 110px 35px 110px;
+  background: transparent;
+  border: 5px solid var(--color-primary-darker);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+.timer-section {
+  background: rgba(0, 0, 0, 0.15);
+  padding: 48px 40px 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 300px;
+  border-radius: 13px 13px 0 0;
+}
+
+.timer-actions {
+  background: var(--color-primary-darker);
+  padding: 28px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  border-radius: 0 0 13px 13px;
 }
 
 .botao-arvore {
@@ -1867,27 +1978,35 @@ body {
   align-items: center;
   justify-content: center;
   width: 40px;
-  background: #5a0e0e;
+  background: rgba(0, 0, 0, 0.3);
   border: none;
-  border-radius: 0 24px 24px 0;
+  border-radius: 0 16px 16px 0;
   cursor: pointer;
   flex-shrink: 0;
   padding: 0;
-  transition: background 0.2s;
+  transition: background 0.2s, order 0.4s ease;
+  order: 1;
 }
 
-.botao-arvore:hover { background: #6e1010; }
-.botao-arvore:active { background: #4a0b0b; transform: translateY(1px); }
+.botao-arvore.aberto {
+  order: 3;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.botao-arvore:hover { background: rgba(0, 0, 0, 0.4); }
+.botao-arvore:active { background: rgba(0, 0, 0, 0.5); transform: translateY(1px); }
 
 .botao-arvore-icone {
-  writing-mode: vertical-rl;
   color: rgba(255,255,255,0.75);
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 900;
   user-select: none;
-  letter-spacing: 4px;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.3s ease;
   line-height: 1;
+}
+
+.botao-arvore.aberto .botao-arvore-icone {
+  transform: rotate(180deg);
 }
 
 .botao-arvore:hover .botao-arvore-icone { color: rgba(255,255,255,1); }
@@ -1896,11 +2015,12 @@ body {
   width: 0;
   overflow: hidden;
   transition: width 0.4s ease;
-  background: rgba(0,0,0,0.3);
-  border-radius: 0 24px 24px 0;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  order: 2;
 }
 
 .arvore-painel.aberto { width: 420px; }
@@ -1916,19 +2036,23 @@ body {
   width: 420px;
 }
 
-.arvore-imagem-wrapper {
+.arvore-imagem-container {
   position: relative;
   width: 400px;
   height: 300px;
   border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
 
 .arvore-imagem {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   border-radius: 16px;
+  border: 7px solid var(--color-primary-darker);
   transition: opacity 0.8s ease;
 }
 
@@ -1936,32 +2060,35 @@ body {
 
 .regador-wrapper {
   position: absolute;
-  bottom: 135px;
-  right: 50px;
-  width: 54px;
-  height: 54px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
   animation: regarMover 2.5s ease-in-out forwards;
+  z-index: 2;
 }
 
-.regador-wrapper.parado { animation: none; }
+.regador-wrapper.parado { opacity: 0; pointer-events: none; }
 
 .regador-wrapper img {
-  width: 100px;
-  height: 100px;
+  width: 60px;
+  height: 60px;
+  margin-left: -5px;
 }
 
 .gota {
   position: absolute;
   width: 4px;
-  height: 8px;
+  height: 10px;
   background: #5bb8ff;
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  border-radius: 50%;
   animation: gotasCair 0.6s ease-in infinite;
 }
 
-.gota:nth-child(1) { left: 2px;  top: -10px; animation-delay: 0s; }
-.gota:nth-child(2) { left: 10px; top: -14px; animation-delay: 0.15s; }
-.gota:nth-child(3) { left: 18px; top: -10px; animation-delay: 0.3s; }
+.gota:nth-child(1) { left: 20px; top: 50px; animation-delay: 0s; }
+.gota:nth-child(2) { left: 28px; top: 50px; animation-delay: 0.15s; }
+.gota:nth-child(3) { left: 36px; top: 50px; animation-delay: 0.3s; }
 
 .arvore-label { font-size: 1rem; font-weight: 700; }
 
@@ -1994,6 +2121,18 @@ body {
 }
 
 .pomodoro-tomato-counter span { font-size: 1.3rem; }
+
+.pomodoro-tomato-counter span:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  font-size: 1.4rem;
+}
+
 .pomodoro-tomato-sep { color: rgba(255,255,255,0.5); }
 .pomodoro-tomato-count { font-weight: bold; }
 
@@ -2026,7 +2165,7 @@ body {
 
 .pomodoro-svg-wrapper {
   position: relative;
-  margin: -20px auto 2px;
+  margin: 0 auto 2px;
 }
 
 .pomodoro-svg-wrapper svg { display: block; }
@@ -2082,12 +2221,25 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 14px;
+  width: 100%;
+}
+
+.pomodoro-btn-group .pomodoro-btn {
+  width: 100%;
 }
 
 .pomodoro-btn-row {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   justify-content: center;
+  width: 100%;
+}
+
+.pomodoro-btn-row .pomodoro-btn {
+  padding: 10px 24px;
+  font-size: 16px;
+  width: 100%;
 }
 
 .pomodoro-tree-message {
@@ -2141,6 +2293,83 @@ body {
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 768px) {
+  .card-wrapper {
+    flex-direction: column;
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .timer-card {
+    border-radius: 16px 16px 0 0;
+    padding: 36px 24px;
+    min-width: unset;
+  }
+
+  .botao-arvore {
+    width: 100%;
+    height: 28px;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .botao-arvore.aberto {
+    border-radius: 0;
+  }
+
+  .botao-arvore-icone {
+    font-size: 18px;
+  }
+
+  .arvore-painel {
+    width: 100% !important;
+    max-height: 0;
+    border-radius: 0;
+    transition: max-height 0.4s ease, width 0s;
+  }
+
+  .arvore-painel.aberto {
+    width: 100% !important;
+    max-height: 500px;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .arvore-conteudo {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .arvore-imagem-wrapper {
+    width: 100%;
+    height: 220px;
+  }
+
+  .pomodoro-timer-text {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .timer-section {
+    padding: 28px 16px 20px;
+  }
+
+  .timer-actions {
+    padding: 16px;
+  }
+
+  .arvore-imagem-wrapper {
+    height: 180px;
+  }
+
+  .pomodoro-timer-text {
+    font-size: 2.2rem;
+  }
+
+  .botao-arvore-icone {
+    font-size: 14px;
+  }
 }
 
 .forgot-page {

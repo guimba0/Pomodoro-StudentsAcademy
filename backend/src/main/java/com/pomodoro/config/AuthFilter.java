@@ -73,7 +73,11 @@ public class AuthFilter implements Filter {
         }
       }
 
-      // 12. Token ausente ou inválido → retorna 401
+      // 12. Token ausente ou inválido → retorna 401 com headers CORS
+      res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Requested-With");
       res.setStatus(401);
       res.setContentType("application/json;charset=UTF-8");
       res.getWriter().write("{\"erro\":\"Não autenticado\"}");
@@ -87,7 +91,7 @@ public class AuthFilter implements Filter {
   // 14. Verifica se o path da requisição está na lista de rotas públicas
   private boolean isPublic(String path) {
     for (String p : PUBLIC_PATHS) {
-      if (path.equals(p)) return true;
+      if (path.equals(p) || path.startsWith(p + "/")) return true;
     }
     return false;
   }

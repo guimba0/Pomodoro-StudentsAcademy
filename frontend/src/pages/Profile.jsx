@@ -6,12 +6,12 @@ import useTitle from '../hooks/useTitle'
 export default function Profile() {
   useTitle('Perfil')
 
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
   const [progresso, setProgresso] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [showAvatarModal, setShowAvatarModal] = useState(false)
-  const [wallpaper, setWallpaper] = useState(null)
-  const [avatar, setAvatar] = useState(null)
+  const [wallpaper, setWallpaper] = useState(user?.wallpaper ?? null)
+  const [avatar, setAvatar] = useState(user?.avatar ?? null)
   const wallpaperRef = useRef()
   const avatarRef = useRef()
 
@@ -67,6 +67,15 @@ export default function Profile() {
       }
     }).catch(err => console.error('[Profile] erro ao carregar aparencia:', err))
   }, [])
+
+  // 8. Sincroniza avatar/wallpaper com o contexto global (Navbar, etc.)
+  useEffect(() => {
+    if (user && setUser) {
+      const updated = { ...user, avatar, wallpaper }
+      setUser(updated)
+      localStorage.setItem('pomodoro_user', JSON.stringify(updated))
+    }
+  }, [avatar, wallpaper])
 
   useEffect(() => {
     apiFetch('/pomodoro/progresso').then(data => {
