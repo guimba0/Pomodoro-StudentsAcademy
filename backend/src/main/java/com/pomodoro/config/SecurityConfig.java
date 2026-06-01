@@ -8,7 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 public class SecurityConfig {
 
-  // 2. Bean do BCrypt — usado para hash e verificação de senhas
+  // 2. Bean do BCrypt (hash e verificação de senhas)
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();

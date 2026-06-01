@@ -2,13 +2,11 @@
 package com.pomodoro.controller;
 
 import com.pomodoro.config.JwtUtil;
-import com.pomodoro.dto.AparenciaRequest;
 import com.pomodoro.dto.AtualizarRequest;
 import com.pomodoro.dto.CadastroRequest;
 import com.pomodoro.dto.LoginRequest;
 import com.pomodoro.dto.LoginResponse;
 import com.pomodoro.dto.RankingResponse;
-import com.pomodoro.dto.RedefinirSenhaRequest;
 import com.pomodoro.dto.UsuarioResponse;
 import com.pomodoro.model.Usuario;
 import com.pomodoro.service.UsuarioService;
@@ -19,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
+// 
 
 @RestController
 @RequestMapping("/api")
@@ -38,7 +38,7 @@ public class AuthController {
     try {
       Usuario u = usuarioService.cadastrar(req.getNome(), req.getEmail(), req.getSenha());
       String token = jwtUtil.gerarToken(u.getId());
-      return ResponseEntity.status(201).body(new LoginResponse(true, token, u.getId(), u.getNome(), u.getEmail(), u.getAvatar(), u.getWallpaper(), u.getPontos(), u.getTomates()));
+      return ResponseEntity.ok(new LoginResponse(true, token, u.getId(), u.getNome(), u.getEmail(), u.getAvatar(), u.getWallpaper(), u.getPontos(), u.getTomates()));
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().body(new LoginResponse(e.getMessage()));
     }
@@ -66,7 +66,7 @@ public class AuthController {
     var usuarioOpt = usuarioService.buscarPorId(usuarioId);
     if (usuarioOpt.isPresent()) {
       Usuario u = usuarioOpt.get();
-      return ResponseEntity.ok(new UsuarioResponse(true, u.getId(), u.getNome(), u.getEmail(), u.getAvatar(), u.getWallpaper(), u.getPontos(), u.getTomates()));
+      return ResponseEntity.ok(new UsuarioResponse(true, u.getNome(), u.getEmail()));
     }
     return ResponseEntity.status(404).body(new UsuarioResponse("Usuário não encontrado"));
   }
@@ -80,7 +80,7 @@ public class AuthController {
     }
     try {
       Usuario u = usuarioService.atualizar(usuarioId, req.getNome(), req.getEmail(), req.getSenha());
-      return ResponseEntity.ok(new UsuarioResponse(true, u.getId(), u.getNome(), u.getEmail(), u.getAvatar(), u.getWallpaper(), u.getPontos(), u.getTomates()));
+      return ResponseEntity.ok(new UsuarioResponse(true, u.getNome(), u.getEmail()));
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().body(new UsuarioResponse(e.getMessage()));
     }
@@ -94,9 +94,15 @@ public class AuthController {
 
   // 7. POST /api/esqueci-senha — redefine a senha pelo email
   @PostMapping("/esqueci-senha")
-  public ResponseEntity<?> redefinirSenha(@Valid @RequestBody RedefinirSenhaRequest req) {
+  public ResponseEntity<?> redefinirSenha(@RequestBody Map<String, String> dados) {
     try {
-      usuarioService.redefinirSenha(req.getEmail(), req.getSenha());
+      String email = dados.get("email");
+      String novaSenha = dados.get("novaSenha");
+      if (novaSenha == null) novaSenha = dados.get("senha");
+      if (email == null || novaSenha == null) {
+        return ResponseEntity.badRequest().body(new UsuarioResponse("E-mail ou senha não enviados corretamente."));
+      }
+      usuarioService.redefinirSenha(email, novaSenha);
       return ResponseEntity.ok(Map.of("mensagem", "Senha alterada com sucesso!"));
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(new UsuarioResponse("Não foi possível alterar: " + e.getMessage()));
@@ -118,39 +124,10 @@ public class AuthController {
     }
   }
 
-  // 9. GET /api/me/aparencia — retorna wallpaper e avatar do usuário
-  @GetMapping("/me/aparencia")
-  public ResponseEntity<?> getAparencia(HttpServletRequest req) {
-    Long usuarioId = (Long) req.getAttribute("usuarioId");
-    if (usuarioId == null) {
-      return ResponseEntity.status(401).body(Map.of("erro", "Não autenticado"));
-    }
-    try {
-      return ResponseEntity.ok(usuarioService.getAparencia(usuarioId));
-    } catch (RuntimeException e) {
-      return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
-    }
-  }
-
-  // 10. PUT /api/me/aparencia — atualiza wallpaper e/ou avatar
-  @PutMapping("/me/aparencia")
-  public ResponseEntity<?> updateAparencia(@RequestBody AparenciaRequest req, HttpServletRequest request) {
-    Long usuarioId = (Long) request.getAttribute("usuarioId");
-    if (usuarioId == null) {
-      return ResponseEntity.status(401).body(Map.of("erro", "Não autenticado"));
-    }
-    try {
-      usuarioService.atualizarAparencia(usuarioId, req.getWallpaper(), req.getAvatar());
-      return ResponseEntity.ok(usuarioService.getAparencia(usuarioId));
-    } catch (RuntimeException e) {
-      return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
-    }
-  }
-
-  // 11. GET /api/ranking — top 10 usuários com mais ciclos completos
+  // 9. GET /api/ranking — top 10 usuários com mais ciclos completos
   @GetMapping("/ranking")
-  public ResponseEntity<?> ranking(@RequestParam(defaultValue = "all") String periodo) {
-    List<RankingResponse> ranking = usuarioService.obterTopRanking(periodo);
+  public ResponseEntity<?> ranking() {
+    List<RankingResponse> ranking = usuarioService.obterTopRanking();
     return ResponseEntity.ok(ranking);
   }
 }
