@@ -171,7 +171,7 @@ A aplicação deve ser executável localmente com instruções no README.
 - Rotas de usuário autenticado devem exigir autenticação.
 
 **RNF-04 — Persistência (logado)**  
-Dados do usuário autenticado e sessões devem ser persistidos em MySQL.
+Dados do usuário autenticado e sessões devem ser persistidos em SQLite (banco embutido, sem instalação externa).
 
 **RNF-05 — Testes automatizados**  
 Deve haver testes automatizados mínimos, especialmente para regras críticas (abandono 120s, cálculo de pontos/tomate).
@@ -201,7 +201,7 @@ A interface do timer deve responder às ações (start/pause/resume/reset) sem t
 ## 8. Dependências e restrições técnicas (contexto)
 - Backend: **Spring Boot**
 - Frontend: **React ou Vue**
-- Banco: **MySQL**
+- Banco: **SQLite** (embutido)
 - Deploy: **local**
 - Documentação/UML obrigatória: casos de uso, classes e sequência
 - Testes automatizados exigidos

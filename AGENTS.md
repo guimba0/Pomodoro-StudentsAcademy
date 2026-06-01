@@ -130,10 +130,7 @@ Uma tarefa é “concluída” quando:
 /
 ├─ backend/                 # Spring Boot
 ├─ frontend/                # React ou Vue
-├─ docs/                    # UML + documentação
-│  ├─ uml/
-│  ├─ requisitos/
-│  └─ imagens/
+├─ docs/                    # (opcional) diagramas UML
 ├─ README.md
 ├─ SPECS.md
 └─ AGENTS.md

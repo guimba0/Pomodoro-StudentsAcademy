@@ -1,14 +1,14 @@
+// 1. DTO de progresso — retorna pontos, tomates e estado da árvore do usuário
 package com.pomodoro.dto;
 
 import com.pomodoro.model.TreeState;
 
 public class ProgressoResponse {
-
-  private int pontos;
-  private int tomates;
-  private String arvoreEstagio;
-  private boolean arvoreMorta;
-  private int focosCompletos;
+  private int pontos;            // 2. Pontos acumulados
+  private int tomates;           // 3. Tomates (maçãs) acumulados
+  private String arvoreEstagio;  // 4. Estágio da árvore: SEED, SEEDLING ou TREE
+  private boolean arvoreMorta;   // 5. true se a árvore morreu (falha na sessão)
+  private int focosCompletos;    // 6. Total de focos concluídos
 
   public ProgressoResponse() {}
 

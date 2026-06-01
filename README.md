@@ -3,7 +3,7 @@
 
 Aplicação web de produtividade baseada no método **Pomodoro** com **gamificação**: enquanto você estuda, você planta uma **árvore virtual** que evolui conforme você completa sessões de foco. Se você **fechar a página** durante o foco e não retornar em até **120 segundos**, a árvore **morre**.
 
-Projeto desenvolvido para a disciplina de **Progratomateo Orientada a Objetos (POO)** — **FATEC**.
+Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos (POO)** — **FATEC**.
 
 ---
 
@@ -15,9 +15,8 @@ Projeto desenvolvido para a disciplina de **Progratomateo Orientada a Objetos (P
 - [Tecnologias](#tecnologias)
 - [Como executar (local)](#como-executar-local)
   - [Pré-requisitos](#pré-requisitos)
-  - [Banco de dados (MySQL)](#banco-de-dados-mysql)
   - [Backend (Spring Boot)](#backend-spring-boot)
-  - [Frontend (React/Vue)](#frontend-reactvue)
+  - [Frontend (React)](#frontend-react)
 - [Estrutura do repositório (sugestão)](#estrutura-do-repositório-sugestão)
 - [Testes](#testes)
 - [Acessibilidade (mínimo)](#acessibilidade-mínimo)
@@ -99,23 +98,8 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
 - **Java 17+** (ou versão usada no projeto)
 - **Maven** (ou Gradle)
 - **Node.js 18+** e **npm** (ou yarn/pnpm)
-- **MySQL 8+**
 
----
-
-### Banco de dados (MySQL)
-
-1. Crie o banco (exemplo):
-   ```sql
-   CREATE DATABASE pomodoro_gamificado;
-   ```
-
-2. (Opcional) Crie um usuário específico:
-   ```sql
-   CREATE USER 'pomodoro'@'localhost' IDENTIFIED BY 'pomodoro';
-   GRANT ALL PRIVILEGES ON pomodoro_gamificado.* TO 'pomodoro'@'localhost';
-   FLUSH PRIVILEGES;
-   ```
+> O banco **SQLite** é embutido — não requer instalação separada. O arquivo `backend/pomodoro.db` é criado automaticamente na primeira execução.
 
 ---
 
@@ -136,7 +120,7 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
 
 ---
 
-### Frontend (React/Vue)
+### Frontend (React)
 
 1. Entre na pasta do frontend:
    ```bash
@@ -165,14 +149,11 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
 ├─ backend/                 # Spring Boot
 │  ├─ src/main/java/...
 │  ├─ src/test/java/...
-│  └─ README.md (opcional)
-├─ frontend/                # React ou Vue
+│  └─ pomodoro.db
+├─ frontend/                # React
 │  ├─ src/...
-│  └─ README.md (opcional)
-└─ docs/                    # UML e documentação
-   ├─ casos-de-uso/
-   ├─ diagrama-classes/
-   └─ diagrama-sequencia/
+│  └─ vite.config.js
+└─ README.md
 ```
 
 ---
@@ -203,9 +184,9 @@ npm test
 
 ## Autores
 
-- Guilherme: Front-end
-- Andressa: Back-end / Banco de Dados
-- Henry: Back-end
+- Guilherme: Integração + Backend Core
+- Andressa: Frontend + UX
+- Henry: Qualidade + Gamificação + Documentação
 
 ---
 

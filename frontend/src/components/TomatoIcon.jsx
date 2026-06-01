@@ -1,3 +1,4 @@
+// 1. Ícone SVG do tomate — usado como logo/marca no navbar e footer
 export default function TomatoIcon({ className, style }) {
   return (
     <svg
@@ -8,6 +9,7 @@ export default function TomatoIcon({ className, style }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
+      {/* 2. Gradientes do corpo, brilho e sombra */}
       <defs>
         <radialGradient id="tomateCorpo" cx="42%" cy="32%" r="58%">
           <stop offset="0%" stopColor="#FF6B4A" />
@@ -25,18 +27,22 @@ export default function TomatoIcon({ className, style }) {
         </radialGradient>
       </defs>
 
+      {/* 3. Sombra projetada no chão */}
       <ellipse cx="60" cy="110" rx="38" ry="8" fill="url(#tomateSombra)" />
 
+      {/* 4. Corpo principal do tomate */}
       <path
         d="M60 22 C25 22 8 40 8 62 C8 84 22 102 60 102 C98 102 112 84 112 62 C112 40 95 22 60 22Z"
         fill="url(#tomateCorpo)"
       />
 
+      {/* 5. Sombra interna no topo */}
       <path
         d="M60 22 C58 28 55 32 50 34 C55 35 58 35 60 34 C62 35 65 35 70 34 C65 32 62 28 60 22Z"
         fill="rgba(0,0,0,0.08)"
       />
 
+      {/* 6. Brilho no corpo */}
       <path
         d="M60 22 C25 22 8 40 8 62 C8 84 22 102 60 102 C98 102 112 84 112 62 C112 40 95 22 60 22Z"
         fill="url(#tomateBrilho)"
@@ -44,12 +50,14 @@ export default function TomatoIcon({ className, style }) {
 
       <ellipse cx="40" cy="44" rx="10" ry="6" fill="rgba(255,255,255,0.08)" transform="rotate(-25 40 44)" />
 
+      {/* 7. Folhas do cabo */}
       <path d="M60 24 C58 16 50 10 42 8 C39 7 38 9 40 11 C44 13 52 18 56 24" fill="#4A7A2E" />
       <path d="M60 24 C62 16 70 10 78 8 C81 7 82 9 80 11 C76 13 68 18 64 24" fill="#4A7A2E" />
       <path d="M60 24 C56 14 46 6 36 4 C32 3 31 6 35 8 C41 11 52 16 58 24" fill="#5A9A3E" />
       <path d="M60 24 C64 14 74 6 84 4 C88 3 89 6 85 8 C79 11 68 16 62 24" fill="#5A9A3E" />
       <path d="M60 24 C60 14 60 8 60 5 C58 5 57 8 57 12 C57 16 58 20 59 24" fill="#3D7A26" />
 
+      {/* 8. Haste central */}
       <path
         d="M60 24 C58 17 56 12 56 6 C57 4 59 3 60 4 C61 5 62 7 61 12 C60 16 60 20 60 24"
         fill="#2D5A1A"

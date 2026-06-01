@@ -1,3 +1,4 @@
+// 1. DTO de cadastro — recebe nome, email e senha do formulário de registro
 package com.pomodoro.dto;
 
 import jakarta.validation.constraints.Email;
@@ -7,13 +8,13 @@ import jakarta.validation.constraints.Size;
 public class CadastroRequest {
 
   @NotBlank
-  private String nome;
+  private String nome;              // 2. Nome do usuário (obrigatório)
 
   @NotBlank @Email
-  private String email;
+  private String email;             // 3. Email válido (obrigatório)
 
   @NotBlank @Size(min = 3)
-  private String senha;
+  private String senha;             // 4. Senha com no mínimo 3 caracteres
 
   public String getNome() { return nome; }
   public void setNome(String nome) { this.nome = nome; }

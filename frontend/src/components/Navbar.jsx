@@ -1,3 +1,4 @@
+// 1. Componente de navegação principal — navbar com links e dropdown do usuário
 import { useState, useRef, useEffect, memo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -12,6 +13,7 @@ function Navbar() {
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
 
+  // 2. Fecha o dropdown ao clicar fora
   useEffect(() => {
     function handleClick(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -22,6 +24,7 @@ function Navbar() {
     return () => document.removeEventListener('click', handleClick)
   }, [])
 
+  // 3. Executa logout — limpa token e redireciona
   function handleLogout() {
     setShowLogoutModal(false)
     setOpen(false)
@@ -54,6 +57,7 @@ function Navbar() {
       </nav>
 
       {user ? (
+        // 4. Usuário logado — avatar + dropdown (Perfil, Config, Sair)
         <div className="nav-profile-wrapper" ref={dropdownRef}>
           <button
             className="nav-profile-btn"
@@ -79,6 +83,7 @@ function Navbar() {
           />
         </div>
       ) : (
+        // 5. Visitante — botões de cadastro e login
         <>
           <Link to="/cadastro" className="nav-link-cadastro">Cadastrar-se</Link>
           <Link to="/login" className="nav-btn-entrar">Entrar</Link>

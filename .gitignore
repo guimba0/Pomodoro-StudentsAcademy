@@ -25,6 +25,9 @@ frontend/node_modules/
 .idea/
 *.iml
 
+# Phantom server folder
+server/
+
 # OS
 .DS_Store
 Thumbs.db

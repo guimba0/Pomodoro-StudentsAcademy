@@ -1,18 +1,16 @@
+// 1. DTO de resposta da sessão Pomodoro — enviado ao frontend ao iniciar/consultar
 package com.pomodoro.dto;
 
 import com.pomodoro.model.PomodoroSession;
-import com.pomodoro.model.SessionStatus;
-import com.pomodoro.model.SessionTipo;
 
 public class PomodoroResponse {
-
-  private Long id;
-  private String tipo;
-  private String status;
-  private String startedAt;
-  private String endsAt;
-  private long tempoRestanteSegundos;
-  private boolean recuperada;
+  private Long id;                           // 2. ID da sessão
+  private String tipo;                       // 3. FOCUS / SHORT_BREAK / LONG_BREAK
+  private String status;                     // 4. IN_PROGRESS / COMPLETED / etc.
+  private String startedAt;                  // 5. Data/hora de início
+  private String endsAt;                     // 6. Data/hora prevista de término
+  private long tempoRestanteSegundos;        // 7. Tempo restante em segundos
+  private boolean recuperada;                // 8. true se foi recuperada (grace period)
 
   public PomodoroResponse() {}
 

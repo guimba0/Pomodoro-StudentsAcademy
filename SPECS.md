@@ -87,7 +87,7 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
 
 ### 4.4 Persistência
 - Visitante: sem persistência (ou persistência local apenas para conveniência, sem ranking).
-- Autenticado: persistência em MySQL de usuário, sessões e saldo.
+- Autenticado: persistência em SQLite de usuário, sessões e saldo.
 
 ---
 
@@ -134,7 +134,7 @@ A árvore cresce enquanto o usuário mantém o foco. Se o usuário **fechar a p�
 - **RNF-01 (Web)** — Deve funcionar em navegadores modernos (Chrome/Edge/Firefox).
 - **RNF-02 (Execução local)** — Deve rodar localmente com instruções no README.
 - **RNF-03 (Segurança)** — Senhas com hash; endpoints protegidos por autenticação.
-- **RNF-04 (Persistência)** — MySQL como banco principal.
+- **RNF-04 (Persistência)** — SQLite como banco principal (embutido, sem instalação externa).
 - **RNF-05 (Testes)** — Cobertura mínima de testes nos serviços críticos (auth + cálculo de recompensas).
 - **RNF-06 (Acessibilidade mínima)** — Contraste e navegação por teclado nos controles do timer.
 - **RNF-07 (Observabilidade mínima)** — Logs básicos no backend para login e criação/finalização de sessão.

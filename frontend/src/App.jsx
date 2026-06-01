@@ -1,3 +1,4 @@
+// 1. Componente raiz — configura roteamento, temas e autenticação
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
@@ -7,6 +8,7 @@ import Footer from './components/Footer'
 import LoadingScreen from './components/LoadingScreen'
 import RotaProtegida from './components/RotaProtegida'
 
+// 2. Lazy loading das páginas (carregadas sob demanda)
 const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Login'))
 const Register = lazy(() => import('./pages/Register'))
@@ -26,6 +28,7 @@ export default function App() {
           <Navbar />
           <Suspense fallback={<LoadingScreen />}>
             <Routes>
+              {/* 3. Rotas públicas — acesso sem login */}
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/cadastro" element={<Register />} />
@@ -33,6 +36,7 @@ export default function App() {
               <Route path="/guia" element={<Guide />} />
               <Route path="/pomodoro" element={<Pomodoro />} />
               <Route path="/loja" element={<Loja />} />
+              {/* 4. Rotas protegidas — exigem autenticação */}
               <Route path="/ranking" element={<RotaProtegida><Ranking /></RotaProtegida>} />
               <Route path="/perfil" element={<RotaProtegida><Profile /></RotaProtegida>} />
               <Route path="/configuracoes" element={<RotaProtegida><Settings /></RotaProtegida>} />

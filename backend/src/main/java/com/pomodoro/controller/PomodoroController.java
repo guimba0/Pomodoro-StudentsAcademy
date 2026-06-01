@@ -1,3 +1,4 @@
+// 1. Controller do Pomodoro — gerencia sessões de foco, pausas, progresso e árvore
 package com.pomodoro.controller;
 
 import com.pomodoro.dto.PomodoroResponse;
@@ -35,6 +36,7 @@ public class PomodoroController {
     this.usuarioRepository = usuarioRepository;
   }
 
+  // 2. POST /api/pomodoro/start — inicia ou recupera uma sessão (FOCUS / SHORT_BREAK / LONG_BREAK)
   @PostMapping("/start")
   public ResponseEntity<?> start(@Valid @RequestBody PomodoroStartRequest req, HttpServletRequest request) {
     Long usuarioId = (Long) request.getAttribute("usuarioId");
@@ -58,6 +60,7 @@ public class PomodoroController {
     }
   }
 
+  // 3. GET /api/pomodoro/current — retorna a sessão atual (usado na recuperação 120s)
   @GetMapping("/current")
   public ResponseEntity<?> current(HttpServletRequest request) {
     Long usuarioId = (Long) request.getAttribute("usuarioId");
@@ -79,6 +82,7 @@ public class PomodoroController {
     return ResponseEntity.ok(new PomodoroResponse(sessao, restante, recuperada));
   }
 
+  // 4. POST /api/pomodoro/finish — finaliza o foco, concede pontos e evolui a árvore
   @PostMapping("/finish")
   public ResponseEntity<?> finish(HttpServletRequest request) {
     Long usuarioId = (Long) request.getAttribute("usuarioId");
@@ -98,6 +102,7 @@ public class PomodoroController {
     }
   }
 
+  // 5. POST /api/pomodoro/reset — cancela a sessão em andamento
   @PostMapping("/reset")
   public ResponseEntity<?> reset(HttpServletRequest request) {
     Long usuarioId = (Long) request.getAttribute("usuarioId");
@@ -109,6 +114,7 @@ public class PomodoroController {
     return ResponseEntity.ok(Map.of("mensagem", "Sessão cancelada."));
   }
 
+  // 6. GET /api/pomodoro/progresso — retorna pontos, tomates e estado da árvore do usuário
   @GetMapping("/progresso")
   public ResponseEntity<?> progresso(HttpServletRequest request) {
     Long usuarioId = (Long) request.getAttribute("usuarioId");

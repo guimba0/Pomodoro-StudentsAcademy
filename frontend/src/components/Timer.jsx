@@ -42,16 +42,16 @@ export default function Timer({ onSessaoConcluida }) {
     };
 
     return (
-        <div style={{ textAlign: 'center', padding: '20px', background: '#f9f9f9', borderRadius: '10px', maxWidth: '300px', margin: '20px auto' }}>
-            <h2 style={{ fontSize: '3rem', margin: '10px 0', color: '#333' }}>
+        <div className="timer-legacy-card">
+            <h2 className="timer-legacy-display">
                 {formatarTempo(segundosRestantes)}
             </h2>
 
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                <button onClick={() => setAtivo(!ativo)} style={{ padding: '10px 20px', backgroundColor: ativo ? '#ff9800' : '#4caf50', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+            <div className="timer-legacy-actions">
+                <button onClick={() => setAtivo(!ativo)} className={`timer-legacy-btn ${ativo ? 'pausar' : 'iniciar'}`}>
                     {ativo ? 'Pausar' : 'Iniciar'}
                 </button>
-                <button onClick={() => { setAtivo(false); setSegundosRestantes(TEMPO_INICIAL); }} style={{ padding: '10px 20px', backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                <button onClick={() => { setAtivo(false); setSegundosRestantes(TEMPO_INICIAL); }} className="timer-legacy-btn resetar">
                     Resetar
                 </button>
             </div>

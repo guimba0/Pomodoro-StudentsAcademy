@@ -59,8 +59,8 @@ export default function Login() {
         </p>
       </div>
 
-      <div className="auth-card" style={{ margin: 0 }}>
-        <h1 style={{ fontSize: 32 }}>Entrar</h1>
+      <div className="auth-card login-card">
+        <h1 className="login-heading">Entrar</h1>
         {erro && <div className="auth-error">{erro}</div>}
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
@@ -69,8 +69,8 @@ export default function Login() {
           <label htmlFor="senha">Senha</label>
           <input id="senha" type="password" placeholder="Sua senha" required value={senha} onChange={e => setSenha(e.target.value)} />
 
-          <p className="auth-link" style={{ marginTop: -12, marginBottom: 16, textAlign: 'right' }}>
-            <Link to="/esqueci-senha" style={{ opacity: 0.7, fontSize: 14 }}>Esqueci a senha</Link>
+          <p className="auth-link login-forgot-row">
+            <Link to="/esqueci-senha" className="login-forgot-link">Esqueci a senha</Link>
           </p>
 
           <button type="submit" className="auth-btn" disabled={loading}>

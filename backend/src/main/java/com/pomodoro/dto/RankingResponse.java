@@ -1,15 +1,15 @@
+// 1. DTO de ranking — estatísticas de cada usuário para a tabela de líderes
 package com.pomodoro.dto;
 
 public class RankingResponse {
-
-  private Long id;
-  private String nome;
-  private String email;
-  private int pontos;
-  private int tomates;
-  private long totalCiclos;
-  private long completos;
-  private long falhos;
+  private Long id;             // 2. ID do usuário
+  private String nome;         // 3. Nome
+  private String email;        // 4. Email
+  private int pontos;          // 5. Pontos totais
+  private int tomates;         // 6. Tomates totais
+  private long totalCiclos;    // 7. Total de ciclos (qualquer status)
+  private long completos;      // 8. Ciclos completos com sucesso
+  private long falhos;         // 9. Ciclos que falharam
 
   public RankingResponse() {}
 

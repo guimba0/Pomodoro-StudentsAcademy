@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { apiFetch } from '../api/api'
 import useTitle from '../hooks/useTitle'
 
+// 1. Constantes do timer (duração, ciclos, medidas do SVG)
 const TEST_SECONDS = 5
 const TOTAL_CYCLES = 4
 
@@ -19,11 +20,13 @@ const getDuration = (m) => {
   return 2
 }
 
+// 2. Página principal do Pomodoro (timer + árvore)
 export default function Pomodoro() {
   useTitle('Timer Pomodoro')
   const { user } = useAuth()
   const isAuthed = !!user
 
+  // 3. Estados do timer e gamificação
   const [status, setStatus] = useState('idle')
   const [remaining, setRemaining] = useState(TEST_SECONDS)
   const [mode, setMode] = useState('focus')
@@ -320,187 +323,15 @@ export default function Pomodoro() {
   }
 
   return (
-    <div className="pomodoro-page" style={{ position: 'relative' }}>
-      <style>{`
-       @keyframes subirSumir {
-                 0%   { opacity: 0; transform: translateY(10px) scale(0.8); }
-                 15%  { opacity: 1; transform: translateY(0px) scale(1.3); }
-                 60%  { opacity: 1; transform: translateY(-50px) scale(1.0); }
-                 100% { opacity: 0; transform: translateY(-90px) scale(0.9); }
-               }
-        }
-        @keyframes subirMensagem {
-          0%   { opacity: 0; transform: translateX(-50%) translateY(-40px); }
-          100% { opacity: 1; transform: translateX(-50%) translateY(0px); }
-        }
-        .card-wrapper {
-          display: flex;
-          align-items: stretch;
-        }
-        .timer-card {
-          background: var(--color-primary-dark);
-          border-radius: 24px 0 0 24px;
-          padding: 110px 35px 110px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          box-shadow:
-            0 0 0 1px rgba(0,0,0,0.2),
-            0 0 8px 2px rgba(0,0,0,0.25),
-            0 0 20px 6px rgba(0,0,0,0.15),
-            0 0 40px 10px rgba(0,0,0,0.08);
-          min-width: 300px;
-        }
-        .botao-arvore {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 40px;
-          background: #5a0e0e;
-          border: none;
-          border-radius: 0 24px 24px 0;
-          cursor: pointer;
-          flex-shrink: 0;
-          padding: 0;
-          box-shadow:
-            0 0 0 1px rgba(0,0,0,0.2),
-            0 0 8px 2px rgba(0,0,0,0.25),
-            0 0 20px 6px rgba(0,0,0,0.15),
-            0 0 40px 10px rgba(0,0,0,0.08);
-          transition: background 0.2s;
-        }
-        .botao-arvore:hover { background: #6e1010; }
-        .botao-arvore:active { background: #4a0b0b; transform: translateY(1px); }
-        .botao-arvore-icone {
-          writing-mode: vertical-rl;
-          color: rgba(255,255,255,0.75);
-          font-size: 16px;
-          font-weight: 900;
-          user-select: none;
-          letter-spacing: 4px;
-          transition: color 0.2s;
-          line-height: 1;
-        }
-        .botao-arvore:hover .botao-arvore-icone { color: rgba(255,255,255,1); }
-        .arvore-painel {
-                  width: 0;
-                  overflow: hidden;
-                  transition: width 0.4s ease;
-                  background: rgba(0,0,0,0.3);
-                  border-radius: 0 24px 24px 0;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  box-shadow:
-                    0 0 0 1px rgba(0,0,0,0.2),
-                    0 0 8px 2px rgba(0,0,0,0.25),
-                    0 0 20px 6px rgba(0,0,0,0.15),
-                    0 0 40px 10px rgba(0,0,0,0.08);
-                }
-                .arvore-painel.aberto { width: 420px; }
-                .arvore-conteudo {
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  gap: 10px;
-                  padding: 16px;
-                  color: white;
-                  text-align: center;
-                  width: 420px;
-                }
-                .arvore-imagem-wrapper {
-                  position: relative;
-                  width: 400px;
-                  height: 300px;
-                  border-radius: 16px;
-                  overflow: hidden;
-                }
-                .arvore-imagem {
-                  width: 100%;
-                  height: 100%;
-                  object-fit: cover;
-                  border-radius: 16px;
-                  transition: opacity 0.8s ease;
-                }
-                .arvore-imagem.trocando { opacity: 0; }
-                @keyframes regarMover {
-                  0%   { transform: translate(0px, 0px) rotate(0deg); }
-                  30%  { transform: translate(-30px, -10px) rotate(-25deg); }
-                  55%  { transform: translate(-40px, 5px) rotate(-35deg); }
-                  80%  { transform: translate(-30px, -10px) rotate(-25deg); }
-                  100% { transform: translate(0px, 0px) rotate(0deg); }
-                }
-                @keyframes gotasCair {
-                  0%   { opacity: 0; transform: translateY(0px); }
-                  30%  { opacity: 1; }
-                  100% { opacity: 0; transform: translateY(20px); }
-                }
-                .regador-wrapper {
-                  position: absolute;
-                  bottom: 135px;
-                  right: 50px;
-                  width: 54px;
-                  height: 54px;
-                  animation: regarMover 2.5s ease-in-out forwards;
-                }
-                .regador-wrapper.parado { animation: none; }
-                .gota {
-                  position: absolute;
-                  width: 4px;
-                  height: 8px;
-                  background: #5bb8ff;
-                  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-                  animation: gotasCair 0.6s ease-in infinite;
-                }
-                .gota:nth-child(1) { left: 2px;  top: -10px; animation-delay: 0s; }
-                .gota:nth-child(2) { left: 10px; top: -14px; animation-delay: 0.15s; }
-                .gota:nth-child(3) { left: 18px; top: -10px; animation-delay: 0.3s; }
-                .arvore-label { font-size: 1rem; font-weight: 700; }
-                .arvore-stats {
-                  font-size: 0.82rem;
-                  color: rgba(255,255,255,0.65);
-                  display: flex;
-                  flex-direction: column;
-                  gap: 4px;
-                }
-                .arvore-stats span {
-                  display: flex;
-                  justify-content: space-between;
-                  gap: 12px;
-                }
-                .arvore-stats .valor { color: white; font-weight: 600; }
-                .arvore-morta { color: #ff6b6b; }
-                .arvore-viva { color: #4caf50; }
-      `}</style>
+    <div className="pomodoro-page">
 
       {isAuthed && (
-        <div style={{
-          position: 'absolute',
-          top: '12px',
-          right: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '1.2rem'
-        }}>
-          <span style={{ fontSize: '1.3rem' }}>🍅</span>
-          <span style={{ color: 'rgba(255,255,255,0.5)' }}>:</span>
-          <span style={{ fontWeight: 'bold' }}>{tomateCount}</span>
+        <div className="pomodoro-tomato-counter">
+          <span>🍅</span>
+          <span className="pomodoro-tomato-sep">:</span>
+          <span className="pomodoro-tomato-count">{tomateCount}</span>
       {animacao && (
-        <span style={{
-          position: 'absolute',
-          top: '-20px',
-          right: '10px',
-          color: '#FFD700',
-          fontWeight: '900',
-          fontSize: '1.1rem',
-          zIndex: '9999',
-          textShadow: '0 0 5px rgba(255,215,0,0.8), 2px 2px 0 #000',
-          animation: 'subirSumir 4s ease-out forwards',
-          pointerEvents: 'none',
-          whiteSpace: 'nowrap',
-          display: 'inline-block'
-        }}>
+        <span className="pomodoro-tomato-anim">
           +{animacao} 🍅
         </span>
       )}
@@ -508,17 +339,7 @@ export default function Pomodoro() {
       )}
 
       {recovered && (
-        <div style={{
-          position: 'absolute',
-          top: '12px',
-          left: '24px',
-          background: '#ffc107',
-          color: '#000',
-          padding: '4px 12px',
-          borderRadius: '20px',
-          fontSize: '0.8rem',
-          fontWeight: 'bold',
-        }}>
+        <div className="pomodoro-recovered-badge">
           ↩ Sessão recuperada
         </div>
       )}
@@ -526,8 +347,8 @@ export default function Pomodoro() {
       <div className="card-wrapper">
         <div className="timer-card">
 
-          <div style={{ position: 'relative', width: `${W}px`, margin: '-20px auto 2px' }}>
-            <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+          <div className="pomodoro-svg-wrapper" style={{ width: `${W}px` }}>
+            <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
               <path
                 d={`M ${CX - RAIO} ${CY} A ${RAIO} ${RAIO} 0 0 1 ${CX + RAIO} ${CY}`}
                 fill="none"
@@ -543,50 +364,29 @@ export default function Pomodoro() {
                 strokeLinecap="round"
                 strokeDasharray={CIRCUNFERENCIA}
                 strokeDashoffset={offset}
-                style={{ transition: 'none' }}
               />
             </svg>
-            <div style={{
-              position: 'absolute',
-              bottom: '0px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              fontSize: '3.7rem',
-              fontWeight: '700',
-              fontFamily: '"Share Tech Mono", "Courier New", monospace',
-              color: 'white',
-              lineHeight: 1,
-              whiteSpace: 'nowrap',
-              letterSpacing: '2px'
-            }}>
+            <div className="pomodoro-timer-text">
               {String(Math.floor(remaining / 60)).padStart(2, '0')}:
               {String(remaining % 60).padStart(2, '0')}
             </div>
           </div>
 
-          <p style={{ fontSize: '1.1rem', margin: '6px 0 10px', fontWeight: '600' }}>
+          <p className="pomodoro-mode-label">
             {labelDoModo(mode)}
           </p>
 
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', margin: '4px 0' }}>
+          <div className="pomodoro-cycle-dots">
             {Array.from({ length: TOTAL_CYCLES }).map((_, i) => (
-              <div key={i} style={{
-                width: '13px',
-                height: '13px',
-                borderRadius: '50%',
-                backgroundColor: i < cycleCount % TOTAL_CYCLES ? '#4caf50' : 'transparent',
-                border: '2px solid',
-                borderColor: i < cycleCount % TOTAL_CYCLES ? '#4caf50' : 'rgba(255,255,255,0.35)',
-                transition: 'all 0.3s ease'
-              }} />
+              <div key={i} className={`pomodoro-cycle-dot${i < cycleCount % TOTAL_CYCLES ? ' active' : ''}`} />
             ))}
           </div>
 
-          <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>
+          <p className="pomodoro-cycle-info">
             {cycleCount % TOTAL_CYCLES}/{TOTAL_CYCLES} ciclos completos
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+          <div className="pomodoro-btn-group">
 
             {status === 'idle' && (
               <button
@@ -605,7 +405,7 @@ export default function Pomodoro() {
             )}
 
             {(status === 'running' || status === 'paused') && (
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <div className="pomodoro-btn-row">
                 <button
                   onClick={resetTimer}
                   className="pomodoro-btn pomodoro-btn-red">
@@ -650,7 +450,7 @@ export default function Pomodoro() {
                               alt="Planta"
                             />
                             <div className={`regador-wrapper ${regando ? '' : 'parado'}`}>
-                                              <img src="/img/regador.png" alt="regador" style={{ width: '100px', height: '100px' }} />
+                                              <img src="/img/regador.png" alt="regador" className="regador-img" />
                                               {regando && (
                                                 <>
                                                   <div className="gota" />
@@ -664,7 +464,7 @@ export default function Pomodoro() {
                             {treeLabel()}
                           </div>
                           {treeData?.morta && (
-                            <div style={{ color: '#ff6b6b', fontSize: '0.82rem', fontWeight: 600 }}>
+                            <div className="pomodoro-tree-message">
                               Sua árvore morreu. Inicie um novo foco para plantar uma nova.
                             </div>
                           )}
@@ -675,13 +475,7 @@ export default function Pomodoro() {
                           </div>
                         </div>
           ) : (
-            <p style={{
-              color: 'rgba(255,255,255,0.3)',
-              fontSize: '0.85rem',
-              textAlign: 'center',
-              padding: '16px',
-              whiteSpace: 'nowrap'
-            }}>
+            <p className="pomodoro-guest-msg">
               Faça login para ter sua árvore
             </p>
           )}
@@ -689,42 +483,14 @@ export default function Pomodoro() {
       </div>
 
       {message && (
-        <div style={{
-          position: 'fixed',
-          top: '25px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: '#a61d1d',
-          borderRadius: '14px',
-          padding: '16px 18px',
-          minWidth: '320px',
-          maxWidth: '500px',
-          zIndex: '9999',
-          animation: 'subirMensagem 0.35s ease-out',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.28)'
-        }}>
-          <p style={{
-            color: 'white',
-            fontSize: '0.97rem',
-            margin: '0 0 16px',
-            textAlign: 'left',
-            lineHeight: '1.4'
-          }}>
+        <div className="pomodoro-message-toast">
+          <p className="pomodoro-message-text">
             {message}
           </p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div className="pomodoro-msg-actions">
             <button
               onClick={() => { setMessage(''); setRecovered(false) }}
-              style={{
-                background: '#c62828',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '8px 18px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                boxShadow: '0 3px 8px rgba(0,0,0,0.2)'
-              }}>
+              className="pomodoro-msg-ok-btn">
               OK
             </button>
           </div>

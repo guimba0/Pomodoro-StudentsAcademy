@@ -4,8 +4,10 @@ import useTitle from '../hooks/useTitle'
 import { fetchRanking } from '../api/api'
 import TomatoIcon from '../components/TomatoIcon'
 
+// 1. Medalhas para o pódio
 const medals = ['🥇', '🥈', '🥉']
 
+// 2. Componente de linha do ranking
 function RankingRow({ pos, entry, isMe }) {
   return (
     <div className={`ranking-row${isMe ? ' ranking-row-me' : ''}`}>
@@ -30,12 +32,16 @@ function RankingRow({ pos, entry, isMe }) {
   )
 }
 
+// 3. Página de ranking
 export default function Ranking() {
   useTitle('Ranking')
   const { user } = useAuth()
+
+  // 4. Estados da página
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  // 5. Busca dados do ranking na API ao montar
   useEffect(() => {
     setLoading(true)
     fetchRanking().then(res => {

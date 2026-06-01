@@ -1,11 +1,12 @@
+// 1. DTO de resposta do login/cadastro — retorna token JWT ou erro
 package com.pomodoro.dto;
 
 public class LoginResponse {
-
-  private boolean logado;
-  private String token;
-  private String nome;
-  private String email;
+  private boolean logado;    // 2. true se autenticou com sucesso
+  private String token;      // 3. Token JWT gerado
+  private String nome;       // 4. Nome do usuário
+  private String email;      // 5. Email do usuário
+  private String erro;       // 6. Mensagem de erro (se houver)
 
   public LoginResponse() {}
 
@@ -20,8 +21,6 @@ public class LoginResponse {
     this.logado = false;
     this.erro = erro;
   }
-
-  private String erro;
 
   public boolean isLogado() { return logado; }
   public String getToken() { return token; }

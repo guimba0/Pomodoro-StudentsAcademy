@@ -95,7 +95,7 @@ export default function Settings() {
 
                   <label htmlFor="configSenha">
                     Nova senha{' '}
-                    <span style={{ fontWeight: 400, opacity: 0.6 }}>(deixe em branco para manter)</span>
+                    <span className="settings-hint">(deixe em branco para manter)</span>
                   </label>
                   <input id="configSenha" type="password" placeholder="Nova senha" value={senha} onChange={e => setSenha(e.target.value)} />
 

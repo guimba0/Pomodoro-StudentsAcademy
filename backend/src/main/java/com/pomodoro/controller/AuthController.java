@@ -1,6 +1,8 @@
+// 1. Controller de autenticação e usuário — gerencia cadastro, login, perfil e ranking
 package com.pomodoro.controller;
 
 import com.pomodoro.config.JwtUtil;
+import com.pomodoro.dto.AparenciaRequest;
 import com.pomodoro.dto.AtualizarRequest;
 import com.pomodoro.dto.CadastroRequest;
 import com.pomodoro.dto.LoginRequest;
@@ -29,6 +31,7 @@ public class AuthController {
     this.jwtUtil = jwtUtil;
   }
 
+  // 2. POST /api/cadastro — cria um novo usuário e retorna o JWT
   @PostMapping("/cadastro")
   public ResponseEntity<?> cadastrar(@Valid @RequestBody CadastroRequest req) {
     try {
@@ -40,6 +43,7 @@ public class AuthController {
     }
   }
 
+  // 3. POST /api/login — autentica email+senha e retorna o JWT
   @PostMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
     var usuarioOpt = usuarioService.login(req.getEmail(), req.getSenha());
@@ -51,6 +55,7 @@ public class AuthController {
     return ResponseEntity.status(401).body(new LoginResponse("E-mail ou senha inválidos."));
   }
 
+  // 4. GET /api/me — retorna nome e email do usuário autenticado
   @GetMapping("/me")
   public ResponseEntity<?> me(HttpServletRequest req) {
     Long usuarioId = (Long) req.getAttribute("usuarioId");
@@ -65,6 +70,7 @@ public class AuthController {
     return ResponseEntity.status(404).body(new UsuarioResponse("Usuário não encontrado"));
   }
 
+  // 5. PUT /api/me — atualiza nome, email e/ou senha do usuário autenticado
   @PutMapping("/me")
   public ResponseEntity<?> atualizar(@Valid @RequestBody AtualizarRequest req, HttpServletRequest request) {
     Long usuarioId = (Long) request.getAttribute("usuarioId");
@@ -79,11 +85,13 @@ public class AuthController {
     }
   }
 
+  // 6. POST /api/logout — endpoint simbólico (o logout é feito no frontend removendo o token)
   @PostMapping("/logout")
   public ResponseEntity<?> logout() {
     return ResponseEntity.ok(Map.of("mensagem", "Logout realizado"));
   }
 
+  // 7. POST /api/esqueci-senha — redefine a senha pelo email
   @PostMapping("/esqueci-senha")
   public ResponseEntity<?> redefinirSenha(@RequestBody Map<String, String> dados) {
     try {
@@ -100,6 +108,7 @@ public class AuthController {
     }
   }
 
+  // 8. POST /api/usuarios/adicionar-pontos — adiciona 10 pontos ao usuário
   @PostMapping("/usuarios/adicionar-pontos")
   public ResponseEntity<?> adicionarPontos(HttpServletRequest req) {
     Long usuarioId = (Long) req.getAttribute("usuarioId");
@@ -114,6 +123,36 @@ public class AuthController {
     }
   }
 
+  // 9. GET /api/me/aparencia — retorna wallpaper e avatar do usuário
+  @GetMapping("/me/aparencia")
+  public ResponseEntity<?> getAparencia(HttpServletRequest req) {
+    Long usuarioId = (Long) req.getAttribute("usuarioId");
+    if (usuarioId == null) {
+      return ResponseEntity.status(401).body(Map.of("erro", "Não autenticado"));
+    }
+    try {
+      return ResponseEntity.ok(usuarioService.getAparencia(usuarioId));
+    } catch (RuntimeException e) {
+      return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
+    }
+  }
+
+  // 10. PUT /api/me/aparencia — atualiza wallpaper e/ou avatar
+  @PutMapping("/me/aparencia")
+  public ResponseEntity<?> updateAparencia(@RequestBody AparenciaRequest req, HttpServletRequest request) {
+    Long usuarioId = (Long) request.getAttribute("usuarioId");
+    if (usuarioId == null) {
+      return ResponseEntity.status(401).body(Map.of("erro", "Não autenticado"));
+    }
+    try {
+      usuarioService.atualizarAparencia(usuarioId, req.getWallpaper(), req.getAvatar());
+      return ResponseEntity.ok(usuarioService.getAparencia(usuarioId));
+    } catch (RuntimeException e) {
+      return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
+    }
+  }
+
+  // 11. GET /api/ranking — top 10 usuários com mais ciclos completos
   @GetMapping("/ranking")
   public ResponseEntity<?> ranking() {
     List<RankingResponse> ranking = usuarioService.obterTopRanking();

@@ -1,3 +1,4 @@
+// 1. Componente de rodapé — exibe créditos do projeto
 import { memo } from 'react'
 
 function Footer() {
