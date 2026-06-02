@@ -54,9 +54,7 @@ O **Árvore do Foco** une o Pomodoro clássico com um sistema simples de recompe
 - **Pontos** por minuto focado + **bônus** ao concluir um foco
 - **Moedas (tomate)**: ganha 1 tomate a cada **5 minutos** de foco válido
 
-### Ranking e Amigos (se implementado)
-- Ranking **global** e/ou por **amigos**
-- Filtros por **semana** e **mês**
+### Ranking
 - Métrica principal: **pontos**
 
 ---
