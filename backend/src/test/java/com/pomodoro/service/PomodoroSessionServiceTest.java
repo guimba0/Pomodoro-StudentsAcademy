@@ -76,10 +76,10 @@ class PomodoroSessionServiceTest {
     verify(sessionRepository, never()).save(any(PomodoroSession.class));
   }
 
-  // 4. Finish — foco concluído adiciona pontos, tomates e evolui árvore
+  // 4. Finish — foco concluído adiciona tomates e evolui árvore
   @Test
-  @DisplayName("finish em sessão de foco adiciona pontos, tomates e evolui árvore")
-  void finish_Foco_AdicionaPontosETomatesEVoluiArvore() {
+  @DisplayName("finish em sessão de foco adiciona tomates e evolui árvore")
+  void finish_Foco_AdicionaTomatesEEvoluiArvore() {
     sessionAtiva.setStatus(SessionStatus.IN_PROGRESS);
     when(sessionRepository.findByUsuarioIdAndStatus(usuarioId, SessionStatus.IN_PROGRESS))
         .thenReturn(Optional.of(sessionAtiva));
@@ -91,9 +91,9 @@ class PomodoroSessionServiceTest {
     PomodoroSession resultado = service.finish(usuarioId);
 
     assertEquals(SessionStatus.COMPLETED, resultado.getStatus());
-    assertEquals(10, resultado.getPontosGanhos());
+    assertEquals(0, resultado.getPontosGanhos());
     assertEquals(10, resultado.getTomatesGanhos());
-    assertEquals(10, usuario.getPontos());
+    assertEquals(0, usuario.getPontos());
     assertEquals(10, usuario.getTomates());
     verify(usuarioRepository).save(usuario);
     verify(treeStateRepository).save(any(TreeState.class));
@@ -183,11 +183,11 @@ class PomodoroSessionServiceTest {
     assertFalse(treeState.isMorta());
   }
 
-  // 11. EvolveTree — transiciona SEEDLING → TREE após 3 focos
+  // 11. EvolveTree — transiciona SEEDLING → TREE após 2 focos
   @Test
-  @DisplayName("evolveTree transiciona SEEDLING → TREE após 3 focos")
+  @DisplayName("evolveTree transiciona SEEDLING → TREE após 2 focos")
   void evolveTree_Seedling_Para_Tree() {
-    treeState.setFocosCompletos(2);
+    treeState.setFocosCompletos(1);
     treeState.setEstagio(TreeEstagio.SEEDLING);
 
     when(sessionRepository.findByUsuarioIdAndStatus(usuarioId, SessionStatus.IN_PROGRESS))
@@ -200,10 +200,30 @@ class PomodoroSessionServiceTest {
     service.finish(usuarioId);
 
     assertEquals(TreeEstagio.TREE, treeState.getEstagio());
+    assertEquals(2, treeState.getFocosCompletos());
+  }
+
+  // 12. EvolveTree — reinicia TREE → SEED após 3 focos (fim do ciclo)
+  @Test
+  @DisplayName("evolveTree reinicia TREE → SEED após 3 focos (fim do ciclo)")
+  void evolveTree_Reinicia_Para_Seed() {
+    treeState.setFocosCompletos(2);
+    treeState.setEstagio(TreeEstagio.TREE);
+
+    when(sessionRepository.findByUsuarioIdAndStatus(usuarioId, SessionStatus.IN_PROGRESS))
+        .thenReturn(Optional.of(sessionAtiva));
+    when(usuarioRepository.findById(usuarioId))
+        .thenReturn(Optional.of(usuario));
+    when(treeStateRepository.findByUsuarioId(usuarioId))
+        .thenReturn(Optional.of(treeState));
+
+    service.finish(usuarioId);
+
+    assertEquals(TreeEstagio.SEED, treeState.getEstagio());
     assertEquals(3, treeState.getFocosCompletos());
   }
 
-  // 12. Calcular tempo restante — retorna 0 para sessão que não é FOCUS
+  // 13. Calcular tempo restante — retorna 0 para sessão que não é FOCUS
   @Test
   @DisplayName("calcularTempoRestante retorna 0 para sessão que não é FOCUS")
   void calcularTempoRestante_RetornaZero_QuandoNaoFocus() {

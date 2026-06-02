@@ -23,7 +23,6 @@ public class PomodoroSessionService {
   // 2. Constantes do jogo
   private static final int FOCUS_DURATION_SEGUNDOS = 25 * 60;  // 25 minutos de foco
   private static final int GRACE_SEGUNDOS = 120;                // 2 min de tolerância para recuperar
-  private static final int BONUS_CONCLUSAO = 10;                // pontos por foco completo
   private static final int TOMATES_POR_CICLO = 10;              // tomates por foco completo
 
   private final PomodoroSessionRepository sessionRepository;
@@ -94,7 +93,7 @@ public class PomodoroSessionService {
     return session;
   }
 
-  // 12. Finaliza a sessão — concede pontos, tomates e evolui a árvore se for foco
+  // 12. Finaliza a sessão — concede tomates e evolui a árvore se for foco
   @Transactional
   public PomodoroSession finish(Long usuarioId) {
     PomodoroSession session = sessionRepository
@@ -110,16 +109,13 @@ public class PomodoroSessionService {
         elapsed = FOCUS_DURATION_SEGUNDOS;  // 13. Limita ao tempo máximo
       }
 
-      int pontos = BONUS_CONCLUSAO;
       int tomates = TOMATES_POR_CICLO;
 
-      session.setPontosGanhos(pontos);
       session.setTomatesGanhos(tomates);
 
-      // 14. Acumula pontos e tomates no usuário
+      // 14. Acumula tomates no usuário
       Usuario usuario = usuarioRepository.findById(usuarioId)
           .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-      usuario.setPontos(usuario.getPontos() + pontos);
       usuario.setTomates(usuario.getTomates() + tomates);
       usuarioRepository.save(usuario);
 
@@ -174,7 +170,7 @@ public class PomodoroSessionService {
     }
   }
 
-  // 20. Evolui a árvore: SEED (0) → SEEDLING (1-2) → TREE (3+ focos completos)
+  // 20. Evolui a árvore: a cada ciclo (3 focos) reinicia SEED → SEEDLING → TREE
   private void evolveTree(Long usuarioId) {
     TreeState tree = treeStateRepository.findByUsuarioId(usuarioId)
         .orElseGet(() -> {
@@ -186,12 +182,14 @@ public class PomodoroSessionService {
     tree.setMorta(false);                       // 21. Revive se estava morta
     tree.setUpdatedAt(LocalDateTime.now());
 
-    int focos = tree.getFocosCompletos();
-    if (focos >= 3) {
-      tree.setEstagio(TreeEstagio.TREE);        // 22. 3+ focos → árvore adulta
-    } else if (focos >= 1) {
-      tree.setEstagio(TreeEstagio.SEEDLING);    // 23. 1-2 focos → muda
-    }                                           // 24. 0 focos → seed (padrão)
+    int focosNoCiclo = tree.getFocosCompletos() % 3;  // 0, 1, 2
+    if (focosNoCiclo == 2) {                    // 22. 2 → árvore adulta
+      tree.setEstagio(TreeEstagio.TREE);
+    } else if (focosNoCiclo == 1) {             // 23. 1 → muda
+      tree.setEstagio(TreeEstagio.SEEDLING);
+    } else {                                    // 24. 0 → semente (reinicia ciclo)
+      tree.setEstagio(TreeEstagio.SEED);
+    }
 
     treeStateRepository.save(tree);
   }

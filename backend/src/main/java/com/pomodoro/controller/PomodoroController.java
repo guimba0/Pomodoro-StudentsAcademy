@@ -94,7 +94,6 @@ public class PomodoroController {
       PomodoroSession sessao = sessionService.finish(usuarioId);
       return ResponseEntity.ok(Map.of(
         "mensagem", "Foco concluído!",
-        "pontosGanhos", sessao.getPontosGanhos(),
         "tomatesGanhos", sessao.getTomatesGanhos()
       ));
     } catch (RuntimeException e) {
@@ -127,6 +126,6 @@ public class PomodoroController {
 
     TreeState tree = treeStateRepository.findByUsuarioId(usuarioId).orElse(null);
 
-    return ResponseEntity.ok(new ProgressoResponse(usuario.getPontos(), usuario.getTomates(), tree));
+    return ResponseEntity.ok(new ProgressoResponse(usuario.getTomates(), tree));
   }
 }

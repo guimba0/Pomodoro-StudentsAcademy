@@ -5,7 +5,7 @@ import useTitle from '../hooks/useTitle'
 
 // 1. Constantes do timer (duração, ciclos, medidas do SVG)
 const TEST_SECONDS = 5
-const TOTAL_CYCLES = 4
+const TOTAL_CYCLES = 3
 
 const RAIO = 110
 const CIRCUNFERENCIA = Math.PI * RAIO + 2
@@ -145,8 +145,7 @@ export default function Pomodoro() {
     setRemaining(dur)
     totalRef.current = dur
 
-    let msg = `Foco concluído! +${data.pontosGanhos} pontos`
-    if (data.tomatesGanhos > 0) msg += `, +${data.tomatesGanhos} tomates`
+    let msg = `Foco concluído! +${data.tomatesGanhos} tomates`
     if (n % TOTAL_CYCLES === 0) {
       msg += `. Você completou ${TOTAL_CYCLES} ciclos! Aproveite sua pausa longa`
     } else {
@@ -198,7 +197,10 @@ export default function Pomodoro() {
     totalRef.current = dur
     setMode('focus')
     setCycleCount(0)
-    if (isAuthed) setTomateCount(0)
+    if (isAuthed) {
+      const data = await apiFetch('/pomodoro/progresso')
+      if (data && !data.erro) setTomateCount(data.tomates ?? 0)
+    }
     setRecovered(false)
     timerFinishedRef.current = false
   }, [isAuthed, status, sessionId])
@@ -325,19 +327,6 @@ export default function Pomodoro() {
   return (
     <div className="pomodoro-page">
 
-      {isAuthed && (
-        <div className="pomodoro-tomato-counter">
-          <span>🍅</span>
-          <span className="pomodoro-tomato-sep">:</span>
-          <span className="pomodoro-tomato-count">{tomateCount}</span>
-      {animacao && (
-        <span className="pomodoro-tomato-anim">
-          +{animacao} 🍅
-        </span>
-      )}
-        </div>
-      )}
-
       {recovered && (
         <div className="pomodoro-recovered-badge">
           ↩ Sessão recuperada
@@ -444,6 +433,7 @@ export default function Pomodoro() {
                           <div className="arvore-imagem-container">
                             <img
                               className="arvore-imagem"
+                              key={treeData?.estagio ?? 'seed' + (treeData?.morta ? '-dead' : '')}
                               src={
                               treeData?.morta
                                 ? '/img/estagio1.jpg'
@@ -476,8 +466,7 @@ export default function Pomodoro() {
                           )}
                           <div className="arvore-stats">
                             <span>Focos completos: <span className="valor">{treeData?.focosCompletos ?? 0}</span></span>
-                            <span>Pontos: <span className="valor">{progresso?.pontos ?? 0}</span></span>
-                            <span>🍅 Tomates: <span className="valor">{progresso?.tomates ?? 0}</span></span>
+                            <span>🍅 Saldo: <span className="valor">{progresso?.tomates ?? 0}</span></span>
                           </div>
                         </div>
           ) : (
